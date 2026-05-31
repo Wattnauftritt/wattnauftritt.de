@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watt'n Auftritt – Digitale Auftritte, Webdesign & Marketing</title>
+  <meta name="description" content="Watt'n Auftritt bringt Ihren Auftritt digital zu Ihren Kunden: modernes Webdesign, Branding, SEO, Marketing sowie Hard- & Software-Support. Sie konzentrieren sich aufs Kerngeschäft – wir auf Ihre digitale Präsenz." />
+  <meta name="theme-color" content="#0b1b2b" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:title" content="Watt'n Auftritt – Ihr digitaler Auftritt" />
+  <meta property="og:description" content="Webdesign, Branding, SEO & Marketing aus einer Hand. Mehr Zeit fürs Wichtige: Ihr Kerngeschäft." />
+  <meta property="og:site_name" content="Watt'n Auftritt" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b1b2b'/%3E%3Cpath d='M12 60q12 -16 24 0t24 0t24 0' fill='none' stroke='%232ea3f2' stroke-width='8' stroke-linecap='round'/%3E%3Cpath d='M12 76q12 -16 24 0t24 0t24 0' fill='none' stroke='%2316d0c4' stroke-width='8' stroke-linecap='round' opacity='.7'/%3E%3C/svg%3E" />
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <!-- HEADER -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Watt'n Auftritt – Startseite">
+        <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true" width="40" height="40">
+          <rect width="100" height="100" rx="24" fill="url(#bg)" />
+          <path d="M12 58q12 -17 24 0t24 0t24 0" fill="none" stroke="#2ea3f2" stroke-width="8" stroke-linecap="round" />
+          <path d="M12 76q12 -17 24 0t24 0t24 0" fill="none" stroke="#16d0c4" stroke-width="8" stroke-linecap="round" opacity=".75" />
+          <defs>
+            <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#102a43" />
+              <stop offset="1" stop-color="#0b1b2b" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="brand__text">Watt'n <strong>Auftritt</strong></span>
+      </a>
+
+      <nav class="nav" aria-label="Hauptnavigation">
+        <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menü öffnen">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav__menu" id="nav-menu">
+          <li><a href="#start">Start</a></li>
+          <li><a href="#leistungen">Leistungen</a></li>
+          <li><a href="#vorteile">Warum wir</a></li>
+          <li><a href="#referenzen">Referenzen</a></li>
+          <li><a class="nav__cta" href="#kontakt">Kontakt</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- HERO -->
+    <section class="hero" id="start">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <p class="eyebrow reveal">Digitale Auftritte · Webdesign · Marketing</p>
+        <h1 class="hero__title reveal">Ihr Auftritt.<br /><span class="grad-text">Digital. Sichtbar. Erfolgreich.</span></h1>
+        <p class="hero__lead reveal">
+          Wir bringen Ihren Auftritt digital zu Ihren Kunden. Was nützt die beste Idee
+          oder das beste Produkt, wenn niemand davon weiß? Wir sorgen dafür, dass man Sie findet.
+        </p>
+        <div class="hero__actions reveal">
+          <a class="btn btn--primary" href="#kontakt">Projekt starten</a>
+          <a class="btn btn--ghost" href="#leistungen">Unsere Leistungen</a>
+        </div>
+
+        <ul class="hero__stats reveal" aria-label="Auf einen Blick">
+          <li><span class="stat__num">6</span><span class="stat__label">Leistungen aus einer Hand</span></li>
+          <li><span class="stat__num">100%</span><span class="stat__label">Fokus auf Ihr Kerngeschäft</span></li>
+          <li><span class="stat__num">24/7</span><span class="stat__label">wenn die Technik streikt</span></li>
+        </ul>
+      </div>
+
+      <!-- Watt / Wellen Motiv -->
+      <svg class="hero__waves" viewBox="0 0 1440 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 60 Q 180 0 360 60 T 720 60 T 1080 60 T 1440 60 V140 H0 Z" fill="#16d0c4" opacity=".10" />
+        <path d="M0 80 Q 180 30 360 80 T 720 80 T 1080 80 T 1440 80 V140 H0 Z" fill="#2ea3f2" opacity=".14" />
+        <path d="M0 100 Q 180 60 360 100 T 720 100 T 1080 100 T 1440 100 V140 H0 Z" fill="var(--bg)" />
+      </svg>
+    </section>
+
+    <!-- LEISTUNGEN -->
+    <section class="section" id="leistungen">
+      <div class="container">
+        <header class="section__head reveal">
+          <p class="eyebrow eyebrow--dark">Was wir am besten können</p>
+          <h2 class="section__title">Alles für Ihren digitalen Auftritt</h2>
+          <p class="section__sub">
+            Erfolg kommt durch Reichweite. Wenn Ihre Kunden Sie nicht finden, generieren Sie keinen
+            Umsatz – und genau diese Arbeit kostet Zeit. Hier entlasten wir Sie, damit Sie mehr Zeit
+            fürs Eigentliche haben.
+          </p>
+        </header>
+
+        <div class="cards">
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2l2.4 5 5.6.6-4 4 1 5.4L12 18l-5 3 1-5.4-4-4 5.6-.6z"/></svg>
+            </div>
+            <h3>Branding</h3>
+            <p>Noch keine Marke? Wir entwickeln Ihre Marke gemeinsam mit Ihnen – vom Logo bis zur Bildsprache.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 5h18v12H3zM3 19h18M9 9l-2 2 2 2M15 9l2 2-2 2"/></svg>
+            </div>
+            <h3>Web Design</h3>
+            <p>Wir entwickeln und erstellen Ihre Website nach Ihren Wünschen – modern, schnell und nutzerfreundlich.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+            </div>
+            <h3>Suchmaschinen&shy;optimierung</h3>
+            <p>Wir optimieren Ihre Website für Google &amp; Co., damit Sie in den Suchergebnissen nicht untergehen.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+            </div>
+            <h3>Marketing&shy;strategie</h3>
+            <p>Wir entwickeln Ihre Werbestrategie, damit Sie immer ganz oben bleiben – datenbasiert und zielgerichtet.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>
+            </div>
+            <h3>Hard- &amp; Software</h3>
+            <p>Auch um Ihre Hard- &amp; Software kümmern wir uns – Wartung, Reparatur und Erneuerung, damit alles läuft.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 1 4 4c0 2-2 3-2 5h-4c0-2-2-3-2-5a4 4 0 0 1 4-4zM9 18h6M10 21h4"/></svg>
+            </div>
+            <h3>IT-Beratung</h3>
+            <p>In allen technischen Fragen beraten wir Sie jederzeit gern – ehrlich, verständlich und auf Augenhöhe.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- VORTEILE / WARUM WIR -->
+    <section class="section section--alt" id="vorteile">
+      <div class="container feature-grid">
+        <div class="feature reveal">
+          <span class="feature__kicker">Mehr Zeit fürs Wichtige</span>
+          <h2 class="feature__title">Konzentrieren Sie sich auf Ihr Kerngeschäft</h2>
+          <p>
+            Wir kümmern uns um Ihren Auftritt und Ihr Marketing, damit Sie sich ganz auf das
+            konzentrieren können, was Sie am besten können.
+          </p>
+          <span class="feature__kicker feature__kicker--mt">Und wenn die Technik streikt?</span>
+          <h3 class="feature__subtitle">Wir halten Ihnen den Rücken frei</h3>
+          <p>
+            Wartung, Reparatur und Erneuerung Ihrer Technik und Software gehören genauso zu unseren
+            Stärken wie Ihr digitaler Auftritt.
+          </p>
+        </div>
+
+        <div class="feature__panel reveal">
+          <h3 class="panel__title">Professionelles Webdesign, das überzeugt</h3>
+          <p class="panel__lead">Ihre Visitenkarte im Internet – modern, schnell und benutzerfreundlich. So werden Besucher zu Kunden.</p>
+          <ul class="check-list">
+            <li><strong>Individuelles Design</strong> – maßgeschneidert auf Ihre Marke</li>
+            <li><strong>Mobile Optimierung</strong> – perfekte Darstellung auf allen Geräten</li>
+            <li><strong>SEO-optimiert</strong> – bessere Sichtbarkeit bei Google &amp; Co.</li>
+            <li><strong>Schnelle Ladezeiten</strong> – für eine bessere Nutzererfahrung</li>
+            <li><strong>Klarer Mehrwert</strong> – intuitive Navigation, ansprechende Inhalte</li>
+          </ul>
+          <p class="panel__foot">Ob Startup, Unternehmen oder Online-Shop – wir gestalten eine digitale Präsenz, die nicht nur gut aussieht, sondern Ergebnisse liefert.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERENZEN -->
+    <section class="section" id="referenzen">
+      <div class="container">
+        <header class="section__head reveal">
+          <p class="eyebrow eyebrow--dark">Unsere Arbeiten</p>
+          <h2 class="section__title">Referenzen</h2>
+          <p class="section__sub">Ein paar unserer letzten Arbeiten:</p>
+        </header>
+
+        <div class="refs">
+          <article class="ref reveal">
+            <div class="ref__thumb" style="--c1:#0b6ec4;--c2:#16d0c4;">
+              <span class="ref__badge">Live</span>
+              <span class="ref__initials">TTS</span>
+            </div>
+            <div class="ref__body">
+              <h3>TTS-Baudienstleistungen</h3>
+              <p>Webauftritt &amp; digitale Präsenz für ein Baudienstleistungs-Unternehmen.</p>
+            </div>
+          </article>
+
+          <article class="ref ref--soon reveal">
+            <div class="ref__thumb ref__thumb--soon">
+              <span class="ref__initials">+</span>
+            </div>
+            <div class="ref__body">
+              <h3>Ihr Projekt?</h3>
+              <p>Coming soon … Hier könnte schon bald Ihr Auftritt stehen.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- KONTAKT -->
+    <section class="section section--contact" id="kontakt">
+      <div class="container contact-grid">
+        <div class="contact__intro reveal">
+          <p class="eyebrow">Lassen Sie uns zusammenarbeiten</p>
+          <h2 class="contact__title">Bereit für Ihren neuen Auftritt?</h2>
+          <p class="contact__lead">
+            Kontaktieren Sie uns noch heute – wir verhelfen Ihnen schnell zum verdienten Erfolg.
+            Erzählen Sie uns kurz von Ihrem Vorhaben, wir melden uns zeitnah bei Ihnen.
+          </p>
+          <ul class="contact__list">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+              <a href="mailto:info@wattnauftritt.de">info@wattnauftritt.de</a>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span>Norddeutschland &amp; bundesweit (remote)</span>
+            </li>
+          </ul>
+          <div class="contact__social" aria-label="Soziale Netzwerke">
+            <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 9h3V6h-3a3 3 0 0 0-3 3v2H9v3h2v6h3v-6h2.5l.5-3H14V9z"/></svg></a>
+            <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r="1"/></svg></a>
+          </div>
+        </div>
+
+        <form class="contact__form reveal" id="contact-form" novalidate>
+          <div class="field">
+            <label for="name">Ihr Name</label>
+            <input type="text" id="name" name="name" autocomplete="name" required placeholder="Max Mustermann" />
+          </div>
+          <div class="field">
+            <label for="email">E-Mail-Adresse</label>
+            <input type="email" id="email" name="email" autocomplete="email" required placeholder="max@beispiel.de" />
+          </div>
+          <div class="field">
+            <label for="subject">Betreff</label>
+            <input type="text" id="subject" name="subject" placeholder="Worum geht es?" />
+          </div>
+          <div class="field">
+            <label for="message">Ihre Nachricht an uns</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Erzählen Sie uns von Ihrem Projekt …"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--block">Senden</button>
+          <p class="form__hint" id="form-hint" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer__brand">
+        <span class="brand__text">Watt'n <strong>Auftritt</strong></span>
+        <p>Wir bringen Ihren Auftritt digital zu Ihren Kunden.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="#leistungen">Leistungen</a>
+        <a href="#referenzen">Referenzen</a>
+        <a href="#kontakt">Kontakt</a>
+        <a href="#impressum">Impressum</a>
+        <a href="#datenschutz">Datenschutz</a>
+      </nav>
+    </div>
+    <div class="container footer__bottom">
+      <p>© <span id="year">2026</span> Watt'n Auftritt. Alle Rechte vorbehalten.</p>
+      <p class="footer__credit">Modern &amp; schnell – ganz ohne Ballast.</p>
+    </div>
+  </footer>
+
+  <script src="assets/main.js" defer></script>
+</body>
+</html>
