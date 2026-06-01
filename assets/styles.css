@@ -3,12 +3,13 @@
    Design-System (Custom Properties)
    ========================================================= */
 :root {
-  /* Markenfarben */
-  --brand: #2ea3f2;          /* Original-Blau der Seite */
-  --brand-deep: #0b6ec4;
-  --aqua: #16d0c4;           /* Watt/Nordsee-Akzent */
-  --ink: #0b1b2b;            /* Tiefes Nachtblau */
-  --ink-2: #102a43;
+  /* Markenfarben (aus dem Logo: Kugelbake im Sonnenuntergang) */
+  --brand: #e15b4c;          /* Sonnenuntergangs-Koralle */
+  --brand-deep: #c8412f;
+  --aqua: #1fa294;           /* Wattenmeer-Tuerkis */
+  --aqua-deep: #14756b;
+  --ink: #15201f;            /* Schwarzgruen (Logo-Rahmen) */
+  --ink-2: #1f302c;
   --bg: #f5f9fc;
   --surface: #ffffff;
   --text: #1d2b39;
@@ -16,13 +17,13 @@
   --line: #e4ecf3;
 
   --grad-brand: linear-gradient(120deg, var(--brand) 0%, var(--aqua) 100%);
-  --grad-ink: radial-gradient(120% 120% at 20% 0%, #14304d 0%, var(--ink) 60%);
+  --grad-ink: radial-gradient(130% 130% at 78% 0%, #33433f 0%, var(--ink) 55%);
 
   --radius: 18px;
   --radius-sm: 12px;
   --shadow-sm: 0 4px 14px rgba(11, 27, 43, .06);
   --shadow: 0 18px 50px -18px rgba(11, 27, 43, .28);
-  --shadow-brand: 0 16px 40px -14px rgba(46, 163, 242, .55);
+  --shadow-brand: 0 16px 40px -14px rgba(225, 91, 76, .5);
 
   --maxw: 1140px;
   --gap: clamp(1rem, 3vw, 2rem);
@@ -79,8 +80,8 @@ p { margin: 0; }
   transition: transform .2s ease, box-shadow .25s ease, background-color .2s ease, color .2s ease;
   will-change: transform;
 }
-.btn--primary { background: var(--grad-brand); color: #042033; box-shadow: var(--shadow-brand); }
-.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 22px 48px -14px rgba(46,163,242,.7); }
+.btn--primary { background: var(--grad-brand); color: #fff; box-shadow: var(--shadow-brand); }
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 22px 48px -14px rgba(225,91,76,.65); }
 .btn--ghost { background: rgba(255,255,255,.06); color: #fff; border-color: rgba(255,255,255,.28); }
 .btn--ghost:hover { background: rgba(255,255,255,.14); transform: translateY(-2px); }
 .btn--block { width: 100%; }
@@ -105,8 +106,9 @@ p { margin: 0; }
 
 .brand { display: inline-flex; align-items: center; gap: .6rem; }
 .brand__mark { border-radius: 12px; box-shadow: var(--shadow-sm); }
-.brand__text { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: var(--ink); }
-.brand__text strong { color: var(--brand-deep); }
+.brand__logo { height: 54px; width: auto; display: block; }
+.brand__text { font-family: var(--font-display); font-weight: 800; font-size: 1.04rem; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
+.brand__text strong { color: var(--brand-deep); font-weight: 800; }
 
 .nav { display: flex; align-items: center; }
 .nav__menu { display: flex; align-items: center; gap: .35rem; list-style: none; margin: 0; padding: 0; }
@@ -114,7 +116,7 @@ p { margin: 0; }
   display: inline-block; padding: .55rem .85rem; border-radius: 999px;
   font-weight: 500; color: var(--text); transition: color .2s, background-color .2s;
 }
-.nav__menu a:hover, .nav__menu a.is-active { color: var(--brand-deep); background: rgba(46,163,242,.10); }
+.nav__menu a:hover, .nav__menu a.is-active { color: var(--brand-deep); background: rgba(225,91,76,.10); }
 .nav__cta { background: var(--ink); color: #fff !important; }
 .nav__cta:hover { background: var(--ink-2) !important; }
 
@@ -144,9 +146,9 @@ p { margin: 0; }
 .eyebrow {
   display: inline-block; font-family: var(--font-display); font-weight: 600; letter-spacing: .12em;
   text-transform: uppercase; font-size: .72rem; color: var(--aqua);
-  padding: .4rem .8rem; border: 1px solid rgba(22,208,196,.35); border-radius: 999px; margin-bottom: 1.2rem;
+  padding: .4rem .8rem; border: 1px solid rgba(31,162,148,.35); border-radius: 999px; margin-bottom: 1.2rem;
 }
-.eyebrow--dark { color: var(--brand-deep); border-color: rgba(46,163,242,.3); background: rgba(46,163,242,.06); }
+.eyebrow--dark { color: var(--brand-deep); border-color: rgba(225,91,76,.3); background: rgba(225,91,76,.06); }
 .hero__title { font-size: clamp(2.4rem, 6.5vw, 4.4rem); font-weight: 800; }
 .hero__lead { margin-top: 1.4rem; font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: #b9cfe0; max-width: 60ch; }
 .hero__actions { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 2.2rem; }
@@ -179,11 +181,11 @@ p { margin: 0; }
   content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--grad-brand);
   transform: scaleX(0); transform-origin: left; transition: transform .35s ease;
 }
-.card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(46,163,242,.4); }
+.card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(225,91,76,.4); }
 .card:hover::after { transform: scaleX(1); }
 .card__icon {
   width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center;
-  background: linear-gradient(135deg, rgba(46,163,242,.14), rgba(22,208,196,.14)); margin-bottom: 1.1rem;
+  background: linear-gradient(135deg, rgba(225,91,76,.14), rgba(31,162,148,.14)); margin-bottom: 1.1rem;
 }
 .card__icon svg { width: 28px; height: 28px; fill: none; stroke: var(--brand-deep); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .card h3 { font-size: 1.22rem; color: var(--ink); margin-bottom: .5rem; hyphens: auto; }
@@ -203,7 +205,7 @@ p { margin: 0; }
 }
 .feature__panel::before {
   content: ""; position: absolute; width: 280px; height: 280px; right: -90px; top: -90px;
-  background: radial-gradient(circle, rgba(46,163,242,.5), transparent 70%); filter: blur(30px);
+  background: radial-gradient(circle, rgba(225,91,76,.5), transparent 70%); filter: blur(30px);
 }
 .panel__title { font-size: 1.5rem; position: relative; }
 .panel__lead { color: #b9cfe0; margin: .7rem 0 1.3rem; position: relative; }
@@ -266,7 +268,7 @@ p { margin: 0; }
 .field input::placeholder, .field textarea::placeholder { color: #7e95a8; }
 .field input:focus, .field textarea:focus {
   outline: none; border-color: var(--aqua); background: rgba(255,255,255,.1);
-  box-shadow: 0 0 0 3px rgba(22,208,196,.22);
+  box-shadow: 0 0 0 3px rgba(31,162,148,.28);
 }
 .form__hint { font-size: .9rem; min-height: 1.2em; margin-top: -.2rem; }
 .form__hint.is-ok { color: var(--aqua); }
