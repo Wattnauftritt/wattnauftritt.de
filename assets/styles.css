@@ -106,7 +106,7 @@ p { margin: 0; }
 
 .brand { display: inline-flex; align-items: center; gap: .6rem; }
 .brand__mark { border-radius: 12px; box-shadow: var(--shadow-sm); }
-.brand__logo { height: 54px; width: auto; display: block; }
+.brand__logo { height: 56px; width: auto; display: block; }
 .brand__text { font-family: var(--font-display); font-weight: 800; font-size: 1.04rem; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
 .brand__text strong { color: var(--brand-deep); font-weight: 800; }
 
