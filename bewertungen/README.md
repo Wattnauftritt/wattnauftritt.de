@@ -37,6 +37,11 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
 > (Aktiv-Schalter, Anbieter-/Async-Felder, `external_id`) und
 > `mysql -u USER -p bewertungen_ < migrations/2026-06-14_customer_reset.sql`
 > (Passwort-Reset für Kundenlogins).
+>
+> **Bequemer:** Wer nur das ursprüngliche `schema.sql` importiert hat, spielt
+> **alle** Nachträge in einem Rutsch ein:
+> `mysql -u USER -p bewertungen_ < migrations/upgrade_all.sql`
+> (nur einmal ausführen; nicht zusätzlich zu den Einzel-Migrationen).
 
 Kundenlogins: Beim Erstellen werden die **Zugangsdaten per E-Mail** an den Kunden
 gesendet (Passwort wird im Panel nicht angezeigt; nur als Fallback bei Mailfehler).
