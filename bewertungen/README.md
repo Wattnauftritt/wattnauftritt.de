@@ -31,9 +31,17 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
    - Admin:      `https://wattnauftritt.de/bewertungen/admin/`
    - Kunde:      `https://wattnauftritt.de/bewertungen/kunde/`
 
-> **Update einer bestehenden Installation:** einmalig
+> **Update einer bestehenden Installation:** die Migrationen im Ordner `migrations/`
+> einmalig einspielen, z. B.
 > `mysql -u USER -p bewertungen_ < migrations/2026-06-14_provider_active.sql`
-> ausführen (fügt Aktiv-Schalter, Anbieter-/Async-Felder und `external_id` hinzu).
+> (Aktiv-Schalter, Anbieter-/Async-Felder, `external_id`) und
+> `mysql -u USER -p bewertungen_ < migrations/2026-06-14_customer_reset.sql`
+> (Passwort-Reset für Kundenlogins).
+
+Kundenlogins: Beim Erstellen werden die **Zugangsdaten per E-Mail** an den Kunden
+gesendet (Passwort wird im Panel nicht angezeigt; nur als Fallback bei Mailfehler).
+Kunden können ihr Passwort unter „Passwort ändern" anpassen und über
+„Passwort vergessen?" per E-Mail-Link (1 Std. gültig) zurücksetzen.
 
 ## Anbieter wählen (SerpApi oder Outscraper)
 

@@ -74,8 +74,11 @@ table.kv td { padding: .35rem 0; }
 
 /* Forms */
 .lbl { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .3rem; }
-.box textarea, .box select { width: 100%; padding: .6rem .75rem; border: 1px solid var(--line); border-radius: var(--radius-sm); font: inherit; background: #fff; }
-.box textarea:focus, .box select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(225,91,76,.15); }
+.box textarea, .box select,
+.box input[type=text], .box input[type=password], .box input[type=email] { width: 100%; max-width: 360px; padding: .6rem .75rem; border: 1px solid var(--line); border-radius: var(--radius-sm); font: inherit; background: #fff; }
+.box textarea { max-width: 100%; }
+.box textarea:focus, .box select:focus,
+.box input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(225,91,76,.15); }
 .inline-form { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
 .inline-form select { width: auto; }
 .actions-col { display: flex; flex-direction: column; gap: .7rem; align-items: flex-start; }

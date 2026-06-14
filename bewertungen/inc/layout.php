@@ -35,6 +35,9 @@ function panel_header(string $title, string $role, string $base = ''): void
     echo '<nav class="topbar__nav">';
     if ($isAdmin) {
         echo '<a href="' . e($base) . 'index.php">Anfragen</a>';
+    } else {
+        echo '<a href="' . e($base) . 'index.php">Mein Auftrag</a>';
+        echo '<a href="' . e($base) . 'passwort.php">Passwort ändern</a>';
     }
     echo '<a class="topbar__logout" href="' . e($base) . 'logout.php">Abmelden</a>';
     echo '</nav></div></header>';

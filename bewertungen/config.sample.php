@@ -26,6 +26,7 @@ define('ADMIN_PASS_HASH', '$2y$10$ERSETZEN_DURCH_ECHTEN_BCRYPT_HASH_____________
 // --- E-Mail-Benachrichtigung ---------------------------------------------
 define('NOTIFY_EMAIL', 'info@wattnauftritt.de');
 define('MAIL_FROM',    'no-reply@wattnauftritt.de');
+define('SITE_URL',     'https://wattnauftritt.de'); // für Links in E-Mails
 
 // --- Sicherheit / Limits --------------------------------------------------
 define('LOOKUP_RATE_LIMIT', 8);     // Live-Lookups pro IP / Stunde

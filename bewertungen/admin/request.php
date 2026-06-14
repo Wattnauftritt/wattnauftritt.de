@@ -5,6 +5,7 @@ require_once __DIR__ . '/../inc/db.php';
 require_once __DIR__ . '/../inc/auth.php';
 require_once __DIR__ . '/../inc/layout.php';
 require_once __DIR__ . '/../inc/scrape.php';
+require_once __DIR__ . '/../inc/mail.php';
 require_admin();
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -105,8 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cid = (int) db()->lastInsertId();
         db()->prepare('UPDATE bm_requests SET customer_id = ? WHERE id = ?')->execute([$cid, $id]);
 
-        flash_set('ok', 'Kundenlogin erstellt – bitte JETZT notieren (Passwort wird nur einmal angezeigt): '
-            . 'Benutzer: ' . $username . ' | Passwort: ' . $password);
+        // Zugangsdaten per E-Mail an den Kunden senden (Passwort nicht im Panel anzeigen).
+        $sent = send_customer_credentials((string) $request['contact_email'], (string) $request['contact_name'], $username, $password);
+        if ($sent) {
+            flash_set('ok', 'Kundenlogin erstellt. Zugangsdaten wurden an ' . $request['contact_email'] . ' gesendet (Benutzer: ' . $username . ').');
+        } else {
+            // Fallback: Mailversand fehlgeschlagen -> Passwort einmalig anzeigen, damit es manuell übermittelt werden kann.
+            flash_set('error', 'Kundenlogin erstellt, aber E-Mail-Versand fehlgeschlagen. Bitte manuell übermitteln – '
+                . 'Benutzer: ' . $username . ' | Passwort: ' . $password);
+        }
         redirect('request.php?id=' . $id);
     }
 

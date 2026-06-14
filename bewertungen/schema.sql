@@ -54,8 +54,11 @@ CREATE TABLE IF NOT EXISTS bm_customers (
   created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME NULL,
   is_active     TINYINT(1) NOT NULL DEFAULT 1,
+  reset_token   CHAR(64) NULL,
+  reset_expires DATETIME NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_username (username)
+  UNIQUE KEY uq_username (username),
+  KEY idx_reset (reset_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Gescrapte Bewertungen pro Anfrage ----------------------------------------
