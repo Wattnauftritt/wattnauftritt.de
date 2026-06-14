@@ -7,9 +7,7 @@
   <title>Bewertungsmanagement – Unrechtmäßige Bewertungen entfernen | Watt'n Auftritt</title>
   <meta name="description" content="Unrechtmäßige Google-Bewertungen professionell prüfen und entfernen lassen. Objekt auswählen, Anfrage stellen – wir sichern Ihre Bewertungen und kümmern uns um den Rest." />
   <meta name="theme-color" content="#15201f" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/fonts/fonts.css" />
   <link rel="icon" href="/assets/logo-min.png" />
   <link rel="stylesheet" href="/assets/styles.css?v=3" />
   <link rel="stylesheet" href="/bewertungsmanagement/assets/public.css" />
