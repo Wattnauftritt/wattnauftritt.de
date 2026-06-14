@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 function outscraper_base(): string
 {
-    return defined('OUTSCRAPER_BASE') && OUTSCRAPER_BASE ? rtrim(OUTSCRAPER_BASE, '/') : 'https://api.outscraper.cloud';
+    return defined('OUTSCRAPER_BASE') && OUTSCRAPER_BASE ? rtrim(OUTSCRAPER_BASE, '/') : 'https://api.app.outscraper.com';
 }
 
 function outscraper_key(): string
@@ -60,7 +60,7 @@ function outscraper_request(string $path, array $params): array
 /** Objektsuche -> Liste passender Google-Listings. */
 function outscraper_lookup(string $q): array
 {
-    $data = outscraper_request('maps/search', [
+    $data = outscraper_request('maps/search-v3', [
         'query'    => $q,
         'limit'    => 6,
         'language' => 'de',
@@ -128,7 +128,7 @@ function outscraper_extract_reviews(array $data): array
  */
 function outscraper_fetch_reviews(string $token, int $limit, int $pollTimeout): array
 {
-    $submit = outscraper_request('maps/reviews', [
+    $submit = outscraper_request('maps/reviews-v3', [
         'query'        => $token,
         'reviewsLimit' => $limit > 0 ? $limit : 0,   // 0 = alle
         'sort'         => 'newest',

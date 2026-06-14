@@ -37,6 +37,6 @@ define('SESSION_NAME', 'WNA_BM');
 // 'serpapi' (Standard) oder 'outscraper'.
 define('REVIEWS_PROVIDER', 'serpapi');
 define('OUTSCRAPER_KEY', '');                              // nur bei REVIEWS_PROVIDER='outscraper'
-define('OUTSCRAPER_BASE', 'https://api.outscraper.cloud'); // ggf. an aktuelle API-Basis anpassen
+define('OUTSCRAPER_BASE', 'https://api.app.outscraper.com');  // Outscraper API-Basis
 define('SCRAPE_POLL_TIMEOUT', 25);                         // Sek. Inline-Warten auf Async-Ergebnis (Web)
 define('QUICK_LIMIT', 20);                                 // Reviews pro Quick-Lauf (Cron)
