@@ -34,17 +34,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $action = $_POST['action'] ?? '';
 
-    if ($action === 'scrape' || $action === 'reconcile') {
-        $res = scrape_request($id, $action === 'reconcile');
-        if ($res['err']) {
-            flash_set('error', 'Abruf abgebrochen: ' . $res['err'] . ' (kein Datenverlust, Löschungen werden nicht markiert).');
+    if ($action === 'scrape' || $action === 'reconcile' || $action === 'resume') {
+        if ($action === 'resume') {
+            $res = resume_request_job($id);
         } else {
-            $msg = sprintf('%d Seite(n) abgerufen, %d Bewertungen, davon %d neu.', $res['pages'], $res['seen'], $res['new']);
+            $res = scrape_request($id, $action === 'reconcile' ? 'reconcile' : 'full');
+        }
+        if ($res['err']) {
+            flash_set('error', 'Abruf abgebrochen: ' . $res['err']);
+        } elseif (!empty($res['pending'])) {
+            flash_set('ok', 'Abruf gestartet – das Ergebnis wird im Hintergrund erstellt. In ein paar Sekunden „Ergebnis abrufen" klicken.');
+        } else {
+            $msg = sprintf('%d Bewertungen verarbeitet, davon %d neu.', $res['seen'], $res['new']);
             if ($action === 'reconcile') {
                 $msg .= sprintf(' %d als gelöscht markiert.', $res['deleted']);
             }
             flash_set('ok', $msg);
         }
+        redirect('request.php?id=' . $id);
+    }
+
+    if ($action === 'toggle_active') {
+        $newActive = empty($request['is_active']) ? 1 : 0;
+        db()->prepare('UPDATE bm_requests SET is_active = ? WHERE id = ?')->execute([$newActive, $id]);
+        flash_set('ok', $newActive
+            ? 'Auftrag aktiviert – wird vom Cron automatisch aktualisiert.'
+            : 'Auftrag deaktiviert – keine automatischen Updates mehr (keine API-Kosten).');
         redirect('request.php?id=' . $id);
     }
 
@@ -161,7 +176,21 @@ panel_header('Anfrage #' . $id, 'admin');
 <div class="grid2">
   <section class="box">
     <h2>Status &amp; Verwaltung</h2>
-    <p>Aktuell: <span class="badge <?= e($stCls) ?>"><?= e($stLbl) ?></span></p>
+    <p>Aktuell: <span class="badge <?= e($stCls) ?>"><?= e($stLbl) ?></span>
+       &nbsp;Auftrag:
+       <?php if (!empty($request['is_active'])): ?>
+         <span class="badge st-done">aktiv</span>
+       <?php else: ?>
+         <span class="badge st-reject">inaktiv</span>
+       <?php endif; ?>
+    </p>
+    <form method="post" class="inline-form" style="margin-bottom:1rem;">
+      <?= csrf_field() ?><input type="hidden" name="action" value="toggle_active">
+      <button class="btn-sm" onclick="return confirm('<?= !empty($request['is_active']) ? 'Auftrag deaktivieren? Es laufen dann keine automatischen Updates mehr.' : 'Auftrag wieder aktivieren? Der Cron aktualisiert ihn dann automatisch.' ?>');">
+        <?= !empty($request['is_active']) ? 'Auftrag deaktivieren' : 'Auftrag aktivieren' ?>
+      </button>
+      <span class="muted small">Nur aktive Aufträge werden automatisch aktualisiert (Kostenkontrolle).</span>
+    </form>
     <form method="post" class="inline-form">
       <?= csrf_field() ?><input type="hidden" name="action" value="status">
       <select name="status">
@@ -182,20 +211,30 @@ panel_header('Anfrage #' . $id, 'admin');
 
   <section class="box">
     <h2>Bewertungen abrufen</h2>
-    <p class="muted small">Voll-Scrape verbraucht SerpApi-Credits (mehrere Seiten). Abgleich erkennt zusätzlich Löschungen.</p>
-    <form method="post" class="actions-col">
-      <?= csrf_field() ?>
-      <button class="btn btn--primary" name="action" value="scrape"
-        onclick="return confirm('Jetzt alle Bewertungen abrufen? Das verbraucht SerpApi-Credits.');">
-        <?= $request['scraped_at'] ? 'Erneut vollständig abrufen' : 'Freigeben &amp; Bewertungen abrufen' ?>
-      </button>
-      <?php if ($request['scraped_at']): ?>
-      <button class="btn btn--ghost" name="action" value="reconcile" style="color:var(--ink);border-color:var(--line);"
-        onclick="return confirm('Abgleich starten und Löschungen markieren?');">
-        Abgleichen (Löschungen erkennen)
-      </button>
-      <?php endif; ?>
-    </form>
+    <p class="muted small">Verbraucht API-Credits (<?= e(reviews_provider()) ?>). „Abgleichen" erkennt zusätzlich gelöschte Bewertungen.</p>
+
+    <?php if (($request['scrape_job_status'] ?? 'none') === 'pending'): ?>
+      <div class="flash flash--ok">Ein Abruf läuft im Hintergrund (Async). Klicke „Ergebnis abrufen", sobald er fertig ist.</div>
+      <form method="post" class="actions-col">
+        <?= csrf_field() ?>
+        <button class="btn btn--primary" name="action" value="resume">Ergebnis abrufen</button>
+      </form>
+    <?php else: ?>
+      <form method="post" class="actions-col">
+        <?= csrf_field() ?>
+        <button class="btn btn--primary" name="action" value="scrape"
+          onclick="return confirm('Jetzt alle Bewertungen abrufen? Das verbraucht API-Credits.');">
+          <?= $request['scraped_at'] ? 'Erneut vollständig abrufen' : 'Freigeben &amp; Bewertungen abrufen' ?>
+        </button>
+        <?php if ($request['scraped_at']): ?>
+        <button class="btn btn--ghost" name="action" value="reconcile" style="color:var(--ink);border-color:var(--line);"
+          onclick="return confirm('Abgleich starten und Löschungen markieren?');">
+          Abgleichen (Löschungen erkennen)
+        </button>
+        <?php endif; ?>
+      </form>
+    <?php endif; ?>
+
     <p class="muted small" style="margin-top:.6rem;">
       <?= $request['scraped_at'] ? 'Zuletzt abgerufen: ' . e(date('d.m.Y H:i', strtotime($request['scraped_at']))) : 'Noch nicht abgerufen.' ?>
       <?= $request['reconciled_at'] ? ' · Letzter Abgleich: ' . e(date('d.m.Y H:i', strtotime($request['reconciled_at']))) : '' ?>

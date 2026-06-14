@@ -46,7 +46,7 @@ panel_header('Anfragen', 'admin');
 <div class="table-wrap">
 <table class="data">
   <thead><tr>
-    <th>#</th><th>Eingang</th><th>Objekt</th><th>Kontakt</th><th>Status</th><th>Bewertungen</th><th>Kunde</th><th></th>
+    <th>#</th><th>Eingang</th><th>Objekt</th><th>Kontakt</th><th>Status</th><th>Aktiv</th><th>Bewertungen</th><th>Kunde</th><th></th>
   </tr></thead>
   <tbody>
   <?php foreach ($rows as $r): [$lbl, $cls] = status_label($r['status']); ?>
@@ -56,6 +56,7 @@ panel_header('Anfragen', 'admin');
       <td><strong><?= e($r['property_name']) ?></strong><br><span class="muted small"><?= e($r['property_type'] ?: '') ?></span></td>
       <td><?= e($r['contact_name']) ?><br><span class="muted small"><?= e($r['contact_email']) ?></span></td>
       <td><span class="badge <?= e($cls) ?>"><?= e($lbl) ?></span></td>
+      <td><?php if (!empty($r['is_active'])): ?><span class="badge st-done">aktiv</span><?php else: ?><span class="badge st-reject">inaktiv</span><?php endif; ?></td>
       <td><?= (int) $r['active_reviews'] ?> aktiv<?php if ((int) $r['deleted_reviews']): ?> · <span class="del"><?= (int) $r['deleted_reviews'] ?> gelöscht</span><?php endif; ?></td>
       <td><?= $r['customer_user'] ? e($r['customer_user']) : '<span class="muted small">–</span>' ?></td>
       <td><a class="btn-sm" href="request.php?id=<?= (int) $r['id'] ?>">Öffnen</a></td>

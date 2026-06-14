@@ -28,10 +28,20 @@ CREATE TABLE IF NOT EXISTS bm_requests (
   admin_note       TEXT NULL,
   scraped_at       DATETIME NULL,
   reconciled_at    DATETIME NULL,
+  -- Aktiv-Schalter: nur aktive Auftraege werden vom Cron aktualisiert (Kostenkontrolle)
+  is_active        TINYINT(1) NOT NULL DEFAULT 1,
+  -- Anbieter & Async-Job-Status
+  provider          VARCHAR(20) NULL,
+  scrape_job_id     VARCHAR(190) NULL,
+  scrape_job_url    VARCHAR(500) NULL,
+  scrape_job_mode   VARCHAR(12) NULL,
+  scrape_job_status ENUM('none','pending','done','error') NOT NULL DEFAULT 'none',
   PRIMARY KEY (id),
   KEY idx_status (status),
   KEY idx_token (property_token),
-  KEY idx_customer (customer_id)
+  KEY idx_customer (customer_id),
+  KEY idx_active (is_active),
+  KEY idx_job_status (scrape_job_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Kundenlogins (vom Admin erzeugt) -----------------------------------------
@@ -53,6 +63,7 @@ CREATE TABLE IF NOT EXISTS bm_reviews (
   id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   request_id    INT UNSIGNED NOT NULL,
   fingerprint   CHAR(64) NOT NULL,
+  external_id   VARCHAR(190) NULL,
   author        VARCHAR(190) NULL,
   rating        TINYINT UNSIGNED NULL,
   source        VARCHAR(120) NULL,
@@ -66,6 +77,7 @@ CREATE TABLE IF NOT EXISTS bm_reviews (
   UNIQUE KEY uq_req_fp (request_id, fingerprint),
   KEY idx_req (request_id),
   KEY idx_deleted (is_deleted),
+  KEY idx_external (external_id),
   CONSTRAINT fk_review_request FOREIGN KEY (request_id)
     REFERENCES bm_requests (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
