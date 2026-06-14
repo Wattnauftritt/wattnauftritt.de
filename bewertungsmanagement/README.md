@@ -22,9 +22,9 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
    ```bash
    php -r "echo password_hash('DEIN_ADMIN_PASSWORT', PASSWORD_DEFAULT), PHP_EOL;"
    ```
-2. Datenbankschema einspielen:
+2. Eigene Datenbank `bewertungen_` anlegen und Schema einspielen:
    ```bash
-   mysql -u USER -p DBNAME < schema.sql
+   mysql -u USER -p bewertungen_ < schema.sql
    ```
 3. Aufrufen:
    - Öffentlich: `https://wattnauftritt.de/bewertungsmanagement/`

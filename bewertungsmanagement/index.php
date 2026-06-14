@@ -183,6 +183,8 @@
         <a href="/#leistungen">Leistungen</a>
         <a href="/bewertungsmanagement/">Bewertungsmanagement</a>
         <a href="/bewertungsmanagement/kunde/login.php">Kundenbereich</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="/datenschutz.html">Datenschutz</a>
       </nav>
     </div>
     <div class="container footer__bottom">
