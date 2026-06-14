@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const API = "/bewertungsmanagement/api";
+  const API = "/bewertungen/api";
   const $ = (id) => document.getElementById(id);
 
   const q = $("bm-q"), searchBtn = $("bm-search"), status = $("bm-status"), results = $("bm-results");

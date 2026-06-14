@@ -25,7 +25,7 @@ function panel_header(string $title, string $role, string $base = ''): void
     echo '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<meta name="robots" content="noindex, nofollow">';
     echo '<title>' . e($title) . ' – Bewertungsmanagement</title>';
-    echo '<link rel="stylesheet" href="/bewertungsmanagement/assets/panel.css">';
+    echo '<link rel="stylesheet" href="/bewertungen/assets/panel.css">';
     echo '</head><body class="panel ' . ($isAdmin ? 'panel--admin' : 'panel--kunde') . '">';
 
     echo '<header class="topbar"><div class="topbar__in">';
@@ -59,7 +59,7 @@ function login_layout(string $title, string $formHtml): void
     echo '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<meta name="robots" content="noindex, nofollow">';
     echo '<title>' . e($title) . '</title>';
-    echo '<link rel="stylesheet" href="/bewertungsmanagement/assets/panel.css">';
+    echo '<link rel="stylesheet" href="/bewertungen/assets/panel.css">';
     echo '</head><body class="login-page">';
     echo '<div class="login-card">';
     echo '<img class="login-logo" src="/assets/logo.webp" alt="Watt\'n Auftritt" height="44">';

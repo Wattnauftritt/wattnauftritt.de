@@ -1,0 +1,3 @@
+# Weiterleitung der alten Adresse auf die kürzere URL (mod_alias).
+# /bewertungsmanagement/... -> /bewertungen/...
+Redirect 301 /bewertungsmanagement /bewertungen

@@ -1,8 +1,10 @@
 # Secrets & lokale Konfiguration – NIEMALS committen
+bewertungen/config.php
 bewertungsmanagement/config.php
 
 # Logs
 *.log
+bewertungen/logs/
 bewertungsmanagement/logs/
 
 # OS / Editor

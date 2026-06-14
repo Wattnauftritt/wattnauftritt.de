@@ -27,9 +27,9 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
    mysql -u USER -p bewertungen_ < schema.sql
    ```
 3. Aufrufen:
-   - Öffentlich: `https://wattnauftritt.de/bewertungsmanagement/`
-   - Admin:      `https://wattnauftritt.de/bewertungsmanagement/admin/`
-   - Kunde:      `https://wattnauftritt.de/bewertungsmanagement/kunde/`
+   - Öffentlich: `https://wattnauftritt.de/bewertungen/`
+   - Admin:      `https://wattnauftritt.de/bewertungen/admin/`
+   - Kunde:      `https://wattnauftritt.de/bewertungen/kunde/`
 
 ## Sicherheit
 
@@ -43,7 +43,7 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
 ## Struktur
 
 ```
-bewertungsmanagement/
+bewertungen/
   index.php            öffentliche Anfrageseite (Wizard)
   config.sample.php    Vorlage – echte Werte in config.php (gitignored)
   schema.sql           Datenbankschema (bm_*-Tabellen)

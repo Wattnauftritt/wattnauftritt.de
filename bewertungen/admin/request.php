@@ -209,7 +209,7 @@ panel_header('Anfrage #' . $id, 'admin');
     <p>Login vorhanden: <strong><?= e($customer['username']) ?></strong>
        <span class="muted small">(erstellt <?= e(date('d.m.Y', strtotime($customer['created_at']))) ?><?= $customer['last_login_at'] ? ', zuletzt aktiv ' . e(date('d.m.Y H:i', strtotime($customer['last_login_at']))) : '' ?>)</span>
     </p>
-    <p class="muted small">Der Kunde sieht unter <code>/bewertungsmanagement/kunde/</code> seinen Auftrag mit aktiven und gelöschten Bewertungen.</p>
+    <p class="muted small">Der Kunde sieht unter <code>/bewertungen/kunde/</code> seinen Auftrag mit aktiven und gelöschten Bewertungen.</p>
   <?php else: ?>
     <p class="muted small">Erzeugt einen Login, mit dem der Kunde seinen Auftrag verfolgen kann. Das Passwort wird nur einmal angezeigt.</p>
     <form method="post">
