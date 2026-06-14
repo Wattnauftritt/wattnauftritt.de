@@ -90,7 +90,7 @@
               <div class="bm-field">
                 <label for="bm-q">Name Ihres Objekts</label>
                 <div class="bm-search-row">
-                  <input type="text" id="bm-q" placeholder="z. B. Hotel Neptuns Ankerplatz Cuxhaven" autocomplete="off" />
+                  <input type="text" id="bm-q" placeholder="z. B. Musterhotel Cuxhaven" autocomplete="off" />
                   <button type="button" class="btn btn--primary" id="bm-search">Suchen</button>
                 </div>
                 <p class="bm-status" id="bm-status" role="status" aria-live="polite"></p>
