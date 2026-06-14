@@ -64,6 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('request.php?id=' . $id);
     }
 
+    if ($action === 'accept') {
+        db()->prepare(
+            "UPDATE bm_requests
+                SET accepted_at = COALESCE(accepted_at, NOW()),
+                    status = IF(status IN ('neu','gescraped'), 'in_bearbeitung', status)
+              WHERE id = ?"
+        )->execute([$id]);
+        flash_set('ok', 'Anfrage angenommen und ins Auftragssystem übernommen.');
+        redirect('request.php?id=' . $id);
+    }
+
     if ($action === 'status') {
         $new = $_POST['status'] ?? '';
         $valid = ['neu', 'gescraped', 'in_bearbeitung', 'abgeschlossen', 'abgelehnt'];
@@ -123,11 +134,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // --- Daten für Anzeige -----------------------------------------------------
 $request = load_request($id); // nach evtl. Änderungen neu laden
-$reviewsStmt = db()->prepare('SELECT * FROM bm_reviews WHERE request_id = ? ORDER BY is_deleted ASC, id DESC');
-$reviewsStmt->execute([$id]);
-$reviews = $reviewsStmt->fetchAll();
-$active  = array_values(array_filter($reviews, fn($r) => !$r['is_deleted']));
-$deleted = array_values(array_filter($reviews, fn($r) => $r['is_deleted']));
+$firstScraped = $request['first_scraped_at'] ?: '1970-01-01 00:00:00';
+
+// Zähler
+$cnt = db()->prepare(
+    'SELECT COUNT(*) AS total,
+            SUM(is_deleted = 0) AS aktiv,
+            SUM(is_deleted = 1) AS geloescht,
+            SUM(first_seen_at > ?) AS neu
+       FROM bm_reviews WHERE request_id = ?'
+);
+$cnt->execute([$firstScraped, $id]);
+$counts = $cnt->fetch() ?: ['total' => 0, 'aktiv' => 0, 'geloescht' => 0, 'neu' => 0];
+
+// Sortierung & Filter
+$sort   = $_GET['sort'] ?? 'neu';
+$filter = $_GET['filter'] ?? 'alle';
+$order  = match ($sort) {
+    'best'     => 'rating DESC, first_seen_at DESC',
+    'schlecht' => 'rating ASC, first_seen_at DESC',
+    default    => 'first_seen_at DESC, id DESC',
+};
+$where = 'request_id = ?';
+$args  = [$id];
+if ($filter === 'geloescht')   { $where .= ' AND is_deleted = 1'; }
+elseif ($filter === 'aktiv')   { $where .= ' AND is_deleted = 0'; }
+elseif ($filter === 'neu')     { $where .= ' AND first_seen_at > ?'; $args[] = $firstScraped; }
+$rstmt = db()->prepare("SELECT * FROM bm_reviews WHERE $where ORDER BY $order");
+$rstmt->execute($args);
+$reviews = $rstmt->fetchAll();
 
 $customer = null;
 if (!empty($request['customer_id'])) {
@@ -138,13 +173,15 @@ if (!empty($request['customer_id'])) {
 
 [$stLbl, $stCls] = status_label($request['status']);
 
-function review_row(array $r): string
+function review_row(array $r, string $firstScraped = ''): string
 {
     $stars = $r['rating'] !== null ? str_repeat('★', (int) $r['rating']) . str_repeat('☆', max(0, 5 - (int) $r['rating'])) : '';
+    $isNew = $firstScraped !== '' && !empty($r['first_seen_at']) && $r['first_seen_at'] > $firstScraped;
     $html  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '">';
     $html .= '<div class="rev__head"><strong>' . e($r['author'] ?: 'Anonym') . '</strong>';
     $html .= '<span class="rev__stars">' . e($stars) . '</span>';
     if ($r['date_relative']) { $html .= '<span class="muted small">' . e($r['date_relative']) . '</span>'; }
+    if ($isNew && !$r['is_deleted']) { $html .= '<span class="badge st-scraped">neu</span>'; }
     if ($r['is_deleted']) { $html .= '<span class="badge st-reject">gelöscht</span>'; }
     $html .= '</div>';
     if ($r['text']) { $html .= '<p class="rev__text">' . nl2br(e($r['text'])) . '</p>'; }
@@ -199,6 +236,20 @@ panel_header('Anfrage #' . $id, 'admin');
       </button>
       <span class="muted small">Nur aktive Aufträge werden automatisch aktualisiert (Kostenkontrolle).</span>
     </form>
+
+    <?php if (empty($request['accepted_at'])): ?>
+    <form method="post" style="margin-bottom:1rem;">
+      <?= csrf_field() ?><input type="hidden" name="action" value="accept">
+      <button class="btn btn--primary">Anfrage annehmen → Auftrag</button>
+      <span class="muted small">Übernimmt die Anfrage ins Auftragssystem.</span>
+    </form>
+    <?php else: ?>
+    <p class="muted small" style="margin-bottom:1rem;">
+      Angenommen am <?= e(date('d.m.Y', strtotime($request['accepted_at']))) ?> ·
+      <a href="abrechnung.php?id=<?= (int) $id ?>"><strong>Abrechnung erstellen</strong></a>
+    </p>
+    <?php endif; ?>
+
     <form method="post" class="inline-form">
       <?= csrf_field() ?><input type="hidden" name="action" value="status">
       <select name="status">
@@ -266,18 +317,36 @@ panel_header('Anfrage #' . $id, 'admin');
   <?php endif; ?>
 </section>
 
+<?php $mkurl = fn(string $s, string $f): string => 'request.php?id=' . $id . '&sort=' . $s . '&filter=' . $f; ?>
 <section class="box">
-  <h2>Bewertungen <span class="muted small">(<?= count($active) ?> aktiv<?= $deleted ? ', ' . count($deleted) . ' gelöscht' : '' ?>)</span></h2>
-  <?php if (!$reviews): ?>
-    <p class="muted">Noch keine Bewertungen abgerufen.</p>
+  <h2>Bewertungen</h2>
+  <div class="stats" style="border-top:0;padding-top:0;">
+    <div class="stat"><span class="stat__num"><?= (int) $counts['total'] ?></span><span class="stat__lbl">gesamt</span></div>
+    <div class="stat"><span class="stat__num"><?= (int) $counts['aktiv'] ?></span><span class="stat__lbl">aktiv</span></div>
+    <div class="stat"><span class="stat__num del"><?= (int) $counts['geloescht'] ?></span><span class="stat__lbl">gelöscht (entfernt)</span></div>
+    <div class="stat"><span class="stat__num"><?= (int) $counts['neu'] ?></span><span class="stat__lbl">neu seit Start</span></div>
+  </div>
+
+  <?php if (!(int) $counts['total']): ?>
+    <p class="muted" style="margin-top:1rem;">Noch keine Bewertungen abgerufen.</p>
   <?php else: ?>
-    <?php if ($active): ?>
-      <h3 class="sub">Aktiv</h3>
-      <ul class="revlist"><?php foreach ($active as $r) { echo review_row($r); } ?></ul>
-    <?php endif; ?>
-    <?php if ($deleted): ?>
-      <h3 class="sub">Gelöscht</h3>
-      <ul class="revlist"><?php foreach ($deleted as $r) { echo review_row($r); } ?></ul>
+    <div class="filterbar" style="margin-top:1rem;">
+      <span class="muted small" style="align-self:center;margin-right:.3rem;">Sortieren:</span>
+      <a href="<?= e($mkurl('neu', $filter)) ?>" class="<?= $sort === 'neu' ? 'is-active' : '' ?>">Neueste</a>
+      <a href="<?= e($mkurl('best', $filter)) ?>" class="<?= $sort === 'best' ? 'is-active' : '' ?>">Beste</a>
+      <a href="<?= e($mkurl('schlecht', $filter)) ?>" class="<?= $sort === 'schlecht' ? 'is-active' : '' ?>">Schlechteste</a>
+    </div>
+    <div class="filterbar">
+      <span class="muted small" style="align-self:center;margin-right:.3rem;">Filter:</span>
+      <a href="<?= e($mkurl($sort, 'alle')) ?>" class="<?= $filter === 'alle' ? 'is-active' : '' ?>">Alle</a>
+      <a href="<?= e($mkurl($sort, 'aktiv')) ?>" class="<?= $filter === 'aktiv' ? 'is-active' : '' ?>">Aktiv</a>
+      <a href="<?= e($mkurl($sort, 'neu')) ?>" class="<?= $filter === 'neu' ? 'is-active' : '' ?>">Neu</a>
+      <a href="<?= e($mkurl($sort, 'geloescht')) ?>" class="<?= $filter === 'geloescht' ? 'is-active' : '' ?>">Gelöscht</a>
+    </div>
+    <?php if ($reviews): ?>
+      <ul class="revlist" style="margin-top:1rem;"><?php foreach ($reviews as $r) { echo review_row($r, $firstScraped); } ?></ul>
+    <?php else: ?>
+      <p class="muted" style="margin-top:1rem;">Keine Bewertungen für diesen Filter.</p>
     <?php endif; ?>
   <?php endif; ?>
 </section>

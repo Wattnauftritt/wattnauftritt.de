@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS bm_requests (
   admin_note       TEXT NULL,
   scraped_at       DATETIME NULL,
   reconciled_at    DATETIME NULL,
+  accepted_at      DATETIME NULL,
+  first_scraped_at DATETIME NULL,
   -- Aktiv-Schalter: nur aktive Auftraege werden vom Cron aktualisiert (Kostenkontrolle)
   is_active        TINYINT(1) NOT NULL DEFAULT 1,
   -- Anbieter & Async-Job-Status
