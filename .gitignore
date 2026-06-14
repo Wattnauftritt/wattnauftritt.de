@@ -1,0 +1,11 @@
+# Secrets & lokale Konfiguration – NIEMALS committen
+bewertungsmanagement/config.php
+
+# Logs
+*.log
+bewertungsmanagement/logs/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
