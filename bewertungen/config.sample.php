@@ -41,3 +41,8 @@ define('OUTSCRAPER_KEY', '');                              // nur bei REVIEWS_PR
 define('OUTSCRAPER_BASE', 'https://api.app.outscraper.com');  // Outscraper API-Basis
 define('SCRAPE_POLL_TIMEOUT', 25);                         // Sek. Inline-Warten auf Async-Ergebnis (Web)
 define('QUICK_LIMIT', 20);                                 // Reviews pro Quick-Lauf (Cron)
+
+// --- Abrechnung -----------------------------------------------------------
+define('PRICE_PER_REMOVAL', 49.00);   // Standardpreis je entfernter Bewertung (netto)
+define('BILLING_BASE_FEE', 0.00);     // optionale Grundgebühr je Abrechnung (netto)
+define('CURRENCY', 'EUR');

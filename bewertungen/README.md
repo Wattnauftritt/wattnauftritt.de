@@ -43,6 +43,21 @@ gesendet (Passwort wird im Panel nicht angezeigt; nur als Fallback bei Mailfehle
 Kunden können ihr Passwort unter „Passwort ändern" anpassen und über
 „Passwort vergessen?" per E-Mail-Link (1 Std. gültig) zurücksetzen.
 
+## Auftragssystem & Abrechnung
+
+- **Anfragen → Aufträge:** In der Anfrage-Detailseite „Anfrage annehmen → Auftrag".
+  Angenommene Anfragen erscheinen unter **„Aufträge"** (`admin/auftraege.php`) und sind
+  dort anklickbar.
+- **Bewertungen** in der Detailseite sind **sortierbar** (Neueste / Beste / Schlechteste)
+  und **filterbar** (Alle / Aktiv / Neu / Gelöscht). Zähler zeigen sofort: gesamt, aktiv,
+  gelöscht (entfernt) und „neu seit Start" (Bewertungen, die nach dem ersten Scrape
+  dazukamen).
+- **Abrechnung** (`admin/abrechnung.php`): druckbare Aufstellung auf Basis der
+  **entfernten** Bewertungen × Preis je Entfernung (+ optionale Grundgebühr, Defaults aus
+  `config.php`: `PRICE_PER_REMOVAL`, `BILLING_BASE_FEE`). Preise pro Abrechnung anpassbar,
+  „Drucken / als PDF speichern". Dient als Grundlage – für rechtsgültige Rechnungen ins
+  eigene Rechnungssystem übernehmen.
+
 ## Anbieter wählen (SerpApi oder Outscraper)
 
 In `config.php`:

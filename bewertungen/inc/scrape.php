@@ -77,7 +77,9 @@ function bm_finish_request(int $requestId): void
 {
     db()->prepare(
         "UPDATE bm_requests
-            SET scraped_at = NOW(), scrape_job_status = 'done',
+            SET scraped_at = NOW(),
+                first_scraped_at = COALESCE(first_scraped_at, NOW()),
+                scrape_job_status = 'done',
                 scrape_job_id = NULL, scrape_job_url = NULL, scrape_job_mode = NULL,
                 status = IF(status = 'neu', 'gescraped', status)
           WHERE id = ?"
