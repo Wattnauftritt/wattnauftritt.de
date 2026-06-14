@@ -1,0 +1,31 @@
+/* Rechtsseiten (Impressum, Datenschutz) – nutzt Tokens aus styles.css. */
+.legal-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245, 249, 252, .82);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.legal-header__in { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.legal-header__in img { height: 50px; width: auto; display: block; }
+.legal-header__in a.back { font-weight: 500; color: var(--text); padding: .55rem .9rem; border-radius: 999px; }
+.legal-header__in a.back:hover { background: rgba(225,91,76,.10); color: var(--brand-deep); }
+
+.legal { max-width: 820px; padding: clamp(2.2rem, 6vw, 4rem) 0 clamp(3rem, 7vw, 5rem); }
+.legal h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); color: var(--ink); letter-spacing: -.02em; }
+.legal .updated { color: var(--muted); font-size: .92rem; margin: .4rem 0 2rem; }
+.legal h2 { font-family: var(--font-display); font-size: 1.3rem; color: var(--ink); margin: 2.2rem 0 .6rem; }
+.legal h3 { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin: 1.4rem 0 .4rem; }
+.legal p, .legal li { color: var(--text); line-height: 1.7; }
+.legal p { margin: .6rem 0; }
+.legal ul { margin: .6rem 0; padding-left: 1.3rem; }
+.legal li { margin: .3rem 0; }
+.legal a { color: var(--brand-deep); }
+.legal address { font-style: normal; line-height: 1.7; }
+.legal hr { border: 0; border-top: 1px solid var(--line); margin: 2.4rem 0; }
+
+/* Auszufüllender Platzhalter – im Quelltext klar markiert. */
+.ph { background: rgba(225,91,76,.14); color: var(--brand-deep); padding: 0 .3em; border-radius: 4px; font-weight: 600; }
+
+.legal .hint { background: rgba(31,162,148,.10); border: 1px solid rgba(31,162,148,.30);
+  border-radius: var(--radius-sm); padding: 1rem 1.2rem; font-size: .92rem; color: var(--aqua-deep); margin: 1.5rem 0; }

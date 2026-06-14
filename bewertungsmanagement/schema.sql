@@ -1,5 +1,6 @@
 -- Bewertungsmanagement – Datenbankschema (MySQL 8 / MariaDB 10+)
--- Einspielen:  mysql -u USER -p DBNAME < schema.sql
+-- Eigene Datenbank (Standard: bewertungen_), getrennt vom Tracker.
+-- Einspielen:  mysql -u USER -p bewertungen_ < schema.sql
 SET NAMES utf8mb4;
 
 -- Anfragen / Aufträge -------------------------------------------------------

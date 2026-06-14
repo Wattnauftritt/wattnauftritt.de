@@ -11,8 +11,9 @@
 define('SERPAPI_KEY', 'HIER_SERPAPI_KEY_EINTRAGEN');
 
 // --- Datenbank (MySQL) ----------------------------------------------------
+// Eigene Datenbank für das Bewertungsmanagement (getrennt vom Tracker).
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'tracker_');
+define('DB_NAME', 'bewertungen_');
 define('DB_USER', 'DB_BENUTZER');
 define('DB_PASS', 'DB_PASSWORT');
 
