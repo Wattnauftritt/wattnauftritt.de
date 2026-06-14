@@ -24,13 +24,17 @@ try {
     rate_hit('lookup');
 } catch (Throwable $ex) {
     error_log('[bewertungen/lookup] DB: ' . $ex->getMessage());
-    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.'], 500);
+    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.']);
 }
 
 try {
     $props = serpapi_property_lookup($q);
 } catch (Throwable $ex) {
-    json_out(['ok' => false, 'error' => $ex->getMessage()], 502);
+    // Echten Grund (z. B. Kontingent erschöpft, ungültiger Key) nur protokollieren,
+    // dem Besucher eine neutrale Meldung zeigen. HTTP 200, damit Cloudflare die
+    // JSON-Antwort nicht durch eine eigene 5xx-Fehlerseite ersetzt.
+    error_log('[bewertungen/lookup] SerpApi: ' . $ex->getMessage());
+    json_out(['ok' => false, 'error' => 'Die Live-Suche ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt.']);
 }
 
 json_out(['ok' => true, 'count' => count($props), 'properties' => $props]);

@@ -20,7 +20,7 @@ try {
     }
 } catch (Throwable $ex) {
     error_log('[bewertungen/submit] DB: ' . $ex->getMessage());
-    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.'], 500);
+    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.']);
 }
 
 $name    = trim($_POST['contact_name'] ?? '');
@@ -69,7 +69,8 @@ try {
     db()->prepare($sql)->execute($data);
     $id = (int) db()->lastInsertId();
 } catch (Throwable $ex) {
-    json_out(['ok' => false, 'error' => 'Speichern fehlgeschlagen. Bitte später erneut versuchen.'], 500);
+    error_log('[bewertungen/submit] INSERT: ' . $ex->getMessage());
+    json_out(['ok' => false, 'error' => 'Speichern fehlgeschlagen. Bitte später erneut versuchen.']);
 }
 
 rate_hit('submit');
