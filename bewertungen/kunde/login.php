@@ -29,6 +29,6 @@ ob_start(); ?>
   <label>Passwort<input type="password" name="pass" autocomplete="current-password" required></label>
   <button type="submit" class="btn btn--primary btn--block">Anmelden</button>
 </form>
-<p class="login-foot"><a href="/">← Zur Website</a></p>
+<p class="login-foot"><a href="passwort-vergessen.php">Passwort vergessen?</a> · <a href="/">Zur Website</a></p>
 <?php
 login_layout('Kundenbereich – Login', ob_get_clean());
