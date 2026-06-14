@@ -14,8 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 if (!empty($_POST['website'])) {
     json_out(['ok' => false, 'error' => 'Abgelehnt.'], 400);
 }
-if (!rate_ok('submit', SUBMIT_RATE_LIMIT, 86400)) {
-    json_out(['ok' => false, 'error' => 'Zu viele Anfragen von dieser Verbindung. Bitte später erneut versuchen.'], 429);
+try {
+    if (!rate_ok('submit', SUBMIT_RATE_LIMIT, 86400)) {
+        json_out(['ok' => false, 'error' => 'Zu viele Anfragen von dieser Verbindung. Bitte später erneut versuchen.'], 429);
+    }
+} catch (Throwable $ex) {
+    error_log('[bewertungen/submit] DB: ' . $ex->getMessage());
+    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.'], 500);
 }
 
 $name    = trim($_POST['contact_name'] ?? '');
