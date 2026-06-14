@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../inc/bootstrap.php';
 require_once __DIR__ . '/../inc/db.php';
-require_once __DIR__ . '/../inc/serpapi.php';
+require_once __DIR__ . '/../inc/reviews_provider.php';
 
 // Honeypot (Bots füllen versteckte Felder)
 if (!empty($_GET['website'])) {
@@ -28,7 +28,7 @@ try {
 }
 
 try {
-    $props = serpapi_property_lookup($q);
+    $props = provider_lookup($q);
 } catch (Throwable $ex) {
     // Echten Grund (z. B. Kontingent erschöpft, ungültiger Key) nur protokollieren,
     // dem Besucher eine neutrale Meldung zeigen. HTTP 200, damit Cloudflare die

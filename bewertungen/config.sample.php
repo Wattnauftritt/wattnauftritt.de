@@ -30,5 +30,13 @@ define('MAIL_FROM',    'no-reply@wattnauftritt.de');
 // --- Sicherheit / Limits --------------------------------------------------
 define('LOOKUP_RATE_LIMIT', 8);     // Live-Lookups pro IP / Stunde
 define('SUBMIT_RATE_LIMIT', 5);     // Anfragen pro IP / Tag
-define('SCRAPE_MAX_PAGES', 50);     // Sicherheitslimit für den Voll-Scrape
+define('SCRAPE_MAX_PAGES', 50);     // Sicherheitslimit für den Voll-Scrape (SerpApi)
 define('SESSION_NAME', 'WNA_BM');
+
+// --- Bewertungs-Anbieter --------------------------------------------------
+// 'serpapi' (Standard) oder 'outscraper'.
+define('REVIEWS_PROVIDER', 'serpapi');
+define('OUTSCRAPER_KEY', '');                              // nur bei REVIEWS_PROVIDER='outscraper'
+define('OUTSCRAPER_BASE', 'https://api.outscraper.cloud'); // ggf. an aktuelle API-Basis anpassen
+define('SCRAPE_POLL_TIMEOUT', 25);                         // Sek. Inline-Warten auf Async-Ergebnis (Web)
+define('QUICK_LIMIT', 20);                                 // Reviews pro Quick-Lauf (Cron)

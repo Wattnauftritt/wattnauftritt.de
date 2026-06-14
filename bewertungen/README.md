@@ -31,6 +31,43 @@ Live-Objektsuche, Admin-Panel zur Verwaltung + Scrape, und Kundenportal zum Verf
    - Admin:      `https://wattnauftritt.de/bewertungen/admin/`
    - Kunde:      `https://wattnauftritt.de/bewertungen/kunde/`
 
+> **Update einer bestehenden Installation:** einmalig
+> `mysql -u USER -p bewertungen_ < migrations/2026-06-14_provider_active.sql`
+> ausführen (fügt Aktiv-Schalter, Anbieter-/Async-Felder und `external_id` hinzu).
+
+## Anbieter wählen (SerpApi oder Outscraper)
+
+In `config.php`:
+```php
+define('REVIEWS_PROVIDER', 'serpapi');   // oder 'outscraper'
+define('OUTSCRAPER_KEY', '...');          // nur für Outscraper
+```
+- **serpapi** – synchron, einfach, pro Suche 1 Credit.
+- **outscraper** – pay-as-you-go, günstiger; Reviews-Abruf läuft **asynchron** (Job →
+  Ergebnis). Im Adminpanel erscheint dann ggf. „Ergebnis abrufen", der Cron holt
+  wartende Jobs automatisch nach. Endpunkt-Pfade/Feldnamen in `inc/outscraper.php`
+  ggf. an die aktuelle Outscraper-API-Doku anpassen.
+
+## Aktiv-Schalter & Kostenkontrolle
+
+Jeder Auftrag hat einen **Aktiv-Schalter** (im Detail umschaltbar). Der Cron aktualisiert
+**nur aktive** Aufträge. Wird ein Kunde inaktiv gesetzt (z. B. zahlt nicht mehr), entstehen
+keine weiteren API-Kosten. Kundenlogins lassen sich über `bm_customers.is_active`
+deaktivieren.
+
+## Cronjobs (automatische Aktualisierung)
+
+CLI-Skript `cron.php` aktualisiert aktive, bereits gescrapte Aufträge:
+```cron
+# Wöchentlicher Vollabgleich inkl. Löscherkennung (So 04:00)
+0 4 * * 0 /opt/plesk/php/8.3/bin/php /var/www/vhosts/wattnauftritt.de/httpdocs/bewertungen/cron.php reconcile >> /var/www/vhosts/wattnauftritt.de/bewertungen-cron.log 2>&1
+
+# Täglich neue Bewertungen einlesen (günstig, ohne Löscherkennung)
+0 6 * * * /opt/plesk/php/8.3/bin/php /var/www/vhosts/wattnauftritt.de/httpdocs/bewertungen/cron.php quick >> /var/www/vhosts/wattnauftritt.de/bewertungen-cron.log 2>&1
+```
+**Jeder Lauf kostet API-Credits pro aktivem Auftrag** – Frequenz bewusst wählen
+(z. B. Abgleich wöchentlich statt täglich).
+
 ## Sicherheit
 
 - **API-Key & Secrets nur in `config.php`** (nicht im Repo). Key bleibt serverseitig,
@@ -49,8 +86,11 @@ bewertungen/
   schema.sql           Datenbankschema (bm_*-Tabellen)
   api/lookup.php       Live-Objektsuche (geschützt)
   api/submit.php       Anfrage anlegen + E-Mail (kein Scrape)
-  admin/               Login, Anfrage-Liste, Detail (Scrape/Reconcile/Kundenlogin)
+  admin/               Login, Anfrage-Liste, Detail (Scrape/Reconcile/Aktiv/Kundenlogin)
   kunde/               Login, Auftragsansicht (aktiv/entfernt)
-  inc/                 bootstrap, db, auth, serpapi, scrape, mail, layout, helpers
+  cron.php             CLI-Cron (quick|reconcile) für aktive Aufträge
+  migrations/          DB-Updates für bestehende Installationen
+  inc/                 bootstrap, db, auth, layout, helpers, mail,
+                       reviews_provider (Adapter), serpapi, outscraper, scrape
   assets/              public.css, wizard.js, panel.css
 ```
