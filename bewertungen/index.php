@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/assets/fonts/fonts.css" />
   <link rel="icon" href="/assets/logo-min.png" />
   <link rel="stylesheet" href="/assets/styles.css?v=3" />
-  <link rel="stylesheet" href="/bewertungsmanagement/assets/public.css" />
+  <link rel="stylesheet" href="/bewertungen/assets/public.css" />
 </head>
 <body>
   <header class="bm-header">
@@ -179,8 +179,8 @@
       <nav class="footer__nav" aria-label="Footer">
         <a href="/">Startseite</a>
         <a href="/#leistungen">Leistungen</a>
-        <a href="/bewertungsmanagement/">Bewertungsmanagement</a>
-        <a href="/bewertungsmanagement/kunde/login.php">Kundenbereich</a>
+        <a href="/bewertungen/">Bewertungsmanagement</a>
+        <a href="/bewertungen/kunde/login.php">Kundenbereich</a>
         <a href="/impressum.html">Impressum</a>
         <a href="/datenschutz.html">Datenschutz</a>
       </nav>
@@ -190,6 +190,6 @@
     </div>
   </footer>
 
-  <script src="/bewertungsmanagement/assets/wizard.js" defer></script>
+  <script src="/bewertungen/assets/wizard.js" defer></script>
 </body>
 </html>
