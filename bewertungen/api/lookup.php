@@ -17,10 +17,15 @@ if (mb_strlen($q) < 3) {
     json_out(['ok' => false, 'error' => 'Bitte mindestens 3 Zeichen eingeben.']);
 }
 
-if (!rate_ok('lookup', LOOKUP_RATE_LIMIT, 3600)) {
-    json_out(['ok' => false, 'error' => 'Zu viele Suchanfragen. Bitte etwas später erneut versuchen.'], 429);
+try {
+    if (!rate_ok('lookup', LOOKUP_RATE_LIMIT, 3600)) {
+        json_out(['ok' => false, 'error' => 'Zu viele Suchanfragen. Bitte etwas später erneut versuchen.'], 429);
+    }
+    rate_hit('lookup');
+} catch (Throwable $ex) {
+    error_log('[bewertungen/lookup] DB: ' . $ex->getMessage());
+    json_out(['ok' => false, 'error' => 'Dienst derzeit nicht verfügbar. Bitte später erneut versuchen.'], 500);
 }
-rate_hit('lookup');
 
 try {
     $props = serpapi_property_lookup($q);
