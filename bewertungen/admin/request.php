@@ -134,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // --- Daten für Anzeige -----------------------------------------------------
 $request = load_request($id); // nach evtl. Änderungen neu laden
+$isOrder = !empty($request['accepted_at']);
 $firstScraped = $request['first_scraped_at'] ?: '1970-01-01 00:00:00';
 
 // Zähler
@@ -147,21 +148,19 @@ $cnt = db()->prepare(
 $cnt->execute([$firstScraped, $id]);
 $counts = $cnt->fetch() ?: ['total' => 0, 'aktiv' => 0, 'geloescht' => 0, 'neu' => 0];
 
-// Sortierung & Filter
-$sort   = $_GET['sort'] ?? 'neu';
-$filter = $_GET['filter'] ?? 'alle';
-$order  = match ($sort) {
-    'best'     => 'rating DESC, first_seen_at DESC',
-    'schlecht' => 'rating ASC, first_seen_at DESC',
-    default    => 'first_seen_at DESC, id DESC',
-};
-$where = 'request_id = ?';
-$args  = [$id];
-if ($filter === 'geloescht')   { $where .= ' AND is_deleted = 1'; }
-elseif ($filter === 'aktiv')   { $where .= ' AND is_deleted = 0'; }
-elseif ($filter === 'neu')     { $where .= ' AND first_seen_at > ?'; $args[] = $firstScraped; }
-$rstmt = db()->prepare("SELECT * FROM bm_reviews WHERE $where ORDER BY $order");
-$rstmt->execute($args);
+// Sterne-Verteilung (aktive Bewertungen)
+$dstmt = db()->prepare(
+    'SELECT rating, SUM(is_deleted = 0) AS aktiv
+       FROM bm_reviews WHERE request_id = ? AND rating BETWEEN 1 AND 5 GROUP BY rating'
+);
+$dstmt->execute([$id]);
+$dist = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+foreach ($dstmt->fetchAll() as $d) { $dist[(int) $d['rating']] = (int) $d['aktiv']; }
+$distMax = max(1, max($dist));
+
+// Alle Bewertungen laden – Sortierung/Filter erfolgt clientseitig (kein Reload, kein Scrollsprung).
+$rstmt = db()->prepare('SELECT * FROM bm_reviews WHERE request_id = ? ORDER BY first_seen_at DESC, id DESC');
+$rstmt->execute([$id]);
 $reviews = $rstmt->fetchAll();
 
 $customer = null;
@@ -175,23 +174,33 @@ if (!empty($request['customer_id'])) {
 
 function review_row(array $r, string $firstScraped = ''): string
 {
-    $stars = $r['rating'] !== null ? str_repeat('★', (int) $r['rating']) . str_repeat('☆', max(0, 5 - (int) $r['rating'])) : '';
-    $isNew = $firstScraped !== '' && !empty($r['first_seen_at']) && $r['first_seen_at'] > $firstScraped;
-    $html  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '">';
-    $html .= '<div class="rev__head"><strong>' . e($r['author'] ?: 'Anonym') . '</strong>';
-    $html .= '<span class="rev__stars">' . e($stars) . '</span>';
-    if ($r['date_relative']) { $html .= '<span class="muted small">' . e($r['date_relative']) . '</span>'; }
-    if ($isNew && !$r['is_deleted']) { $html .= '<span class="badge st-scraped">neu</span>'; }
-    if ($r['is_deleted']) { $html .= '<span class="badge st-reject">gelöscht</span>'; }
-    $html .= '</div>';
-    if ($r['text']) { $html .= '<p class="rev__text">' . nl2br(e($r['text'])) . '</p>'; }
-    $html .= '</li>';
-    return $html;
+    $rating  = $r['rating'] !== null ? (int) $r['rating'] : 0;
+    $stars   = $rating ? str_repeat('★', $rating) . str_repeat('☆', max(0, 5 - $rating)) : '';
+    $isNew   = $firstScraped !== '' && !empty($r['first_seen_at']) && $r['first_seen_at'] > $firstScraped;
+    $author  = trim((string) ($r['author'] ?? '')) ?: 'Anonym';
+    $initial = mb_strtoupper(mb_substr($author, 0, 1));
+
+    $h  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '"'
+        . ' data-rating="' . $rating . '"'
+        . ' data-deleted="' . ((int) $r['is_deleted']) . '"'
+        . ' data-new="' . ($isNew && !$r['is_deleted'] ? 1 : 0) . '"'
+        . ' data-seen="' . e((string) ($r['first_seen_at'] ?? '')) . '"'
+        . ' data-id="' . (int) $r['id'] . '">';
+    $h .= '<div class="rev__inner"><div class="rev__avatar">' . e($initial) . '</div><div class="rev__body">';
+    $h .= '<div class="rev__head"><strong>' . e($author) . '</strong>';
+    $h .= '<span class="rev__stars" title="' . $rating . ' von 5">' . e($stars) . '</span>';
+    if ($r['date_relative']) { $h .= '<span class="muted small">' . e($r['date_relative']) . '</span>'; }
+    if ($isNew && !$r['is_deleted']) { $h .= '<span class="badge st-scraped">neu</span>'; }
+    if ($r['is_deleted']) { $h .= '<span class="badge st-reject">entfernt</span>'; }
+    $h .= '</div>';
+    if ($r['text']) { $h .= '<p class="rev__text">' . nl2br(e($r['text'])) . '</p>'; }
+    $h .= '</div></div></li>';
+    return $h;
 }
 
-panel_header('Anfrage #' . $id, 'admin');
+panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
 ?>
-<p><a class="btn-sm" href="index.php">← Zurück zur Liste</a></p>
+<p><a class="btn-sm" href="<?= $isOrder ? 'auftraege.php' : 'index.php' ?>">← Zurück zur <?= $isOrder ? 'Auftragsliste' : 'Anfrageliste' ?></a></p>
 
 <div class="grid2">
   <section class="box">
@@ -317,7 +326,6 @@ panel_header('Anfrage #' . $id, 'admin');
   <?php endif; ?>
 </section>
 
-<?php $mkurl = fn(string $s, string $f): string => 'request.php?id=' . $id . '&sort=' . $s . '&filter=' . $f; ?>
 <section class="box">
   <h2>Bewertungen</h2>
   <div class="stats" style="border-top:0;padding-top:0;">
@@ -330,24 +338,86 @@ panel_header('Anfrage #' . $id, 'admin');
   <?php if (!(int) $counts['total']): ?>
     <p class="muted" style="margin-top:1rem;">Noch keine Bewertungen abgerufen.</p>
   <?php else: ?>
-    <div class="filterbar" style="margin-top:1rem;">
+    <h3 class="sub">Verteilung (aktiv) – zum Filtern klicken</h3>
+    <div class="rating-dist" id="bm-dist">
+      <?php for ($s = 5; $s >= 1; $s--): $w = (int) round($dist[$s] / $distMax * 100); ?>
+        <button type="button" data-star="<?= $s ?>" title="Nur <?= $s ?>-Sterne-Bewertungen anzeigen">
+          <span class="rd-label"><?= $s ?> <b>★</b></span>
+          <span class="rd-track"><span class="rd-fill" style="width:<?= $w ?>%"></span></span>
+          <span class="rd-count"><?= (int) $dist[$s] ?></span>
+        </button>
+      <?php endfor; ?>
+    </div>
+
+    <div class="filterbar" style="margin-top:1.2rem;">
       <span class="muted small" style="align-self:center;margin-right:.3rem;">Sortieren:</span>
-      <a href="<?= e($mkurl('neu', $filter)) ?>" class="<?= $sort === 'neu' ? 'is-active' : '' ?>">Neueste</a>
-      <a href="<?= e($mkurl('best', $filter)) ?>" class="<?= $sort === 'best' ? 'is-active' : '' ?>">Beste</a>
-      <a href="<?= e($mkurl('schlecht', $filter)) ?>" class="<?= $sort === 'schlecht' ? 'is-active' : '' ?>">Schlechteste</a>
+      <button type="button" data-sort="neu" class="is-active">Neueste</button>
+      <button type="button" data-sort="best">Beste</button>
+      <button type="button" data-sort="schlecht">Schlechteste</button>
     </div>
     <div class="filterbar">
       <span class="muted small" style="align-self:center;margin-right:.3rem;">Filter:</span>
-      <a href="<?= e($mkurl($sort, 'alle')) ?>" class="<?= $filter === 'alle' ? 'is-active' : '' ?>">Alle</a>
-      <a href="<?= e($mkurl($sort, 'aktiv')) ?>" class="<?= $filter === 'aktiv' ? 'is-active' : '' ?>">Aktiv</a>
-      <a href="<?= e($mkurl($sort, 'neu')) ?>" class="<?= $filter === 'neu' ? 'is-active' : '' ?>">Neu</a>
-      <a href="<?= e($mkurl($sort, 'geloescht')) ?>" class="<?= $filter === 'geloescht' ? 'is-active' : '' ?>">Gelöscht</a>
+      <button type="button" data-filter="alle" class="is-active">Alle</button>
+      <button type="button" data-filter="aktiv">Aktiv</button>
+      <button type="button" data-filter="neu">Neu</button>
+      <button type="button" data-filter="geloescht">Gelöscht</button>
     </div>
-    <?php if ($reviews): ?>
-      <ul class="revlist" style="margin-top:1rem;"><?php foreach ($reviews as $r) { echo review_row($r, $firstScraped); } ?></ul>
-    <?php else: ?>
-      <p class="muted" style="margin-top:1rem;">Keine Bewertungen für diesen Filter.</p>
-    <?php endif; ?>
+
+    <ul class="revlist" id="bm-revlist" style="margin-top:1rem;">
+      <?php foreach ($reviews as $r) { echo review_row($r, $firstScraped); } ?>
+    </ul>
+    <p class="muted" id="bm-empty" style="margin-top:1rem;display:none;">Keine Bewertungen für diese Auswahl.</p>
   <?php endif; ?>
 </section>
+
+<script>
+(function () {
+  var list = document.getElementById('bm-revlist');
+  if (!list) return;
+  var items = [].slice.call(list.children);
+  var empty = document.getElementById('bm-empty');
+  var state = { sort: 'neu', filter: 'alle', star: 0 };
+
+  function mark(sel, attr, val) {
+    document.querySelectorAll(sel).forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute(attr) === String(val));
+    });
+  }
+  function apply() {
+    var vis = items.filter(function (li) {
+      if (state.filter === 'aktiv' && li.dataset.deleted === '1') return false;
+      if (state.filter === 'geloescht' && li.dataset.deleted !== '1') return false;
+      if (state.filter === 'neu' && li.dataset.new !== '1') return false;
+      if (state.star && li.dataset.rating !== String(state.star)) return false;
+      return true;
+    });
+    vis.sort(function (a, b) {
+      if (state.sort === 'best') return (b.dataset.rating - a.dataset.rating) || (b.dataset.id - a.dataset.id);
+      if (state.sort === 'schlecht') return (a.dataset.rating - b.dataset.rating) || (b.dataset.id - a.dataset.id);
+      if (a.dataset.seen !== b.dataset.seen) return a.dataset.seen < b.dataset.seen ? 1 : -1;
+      return b.dataset.id - a.dataset.id;
+    });
+    items.forEach(function (li) { li.style.display = 'none'; });
+    vis.forEach(function (li) { li.style.display = ''; list.appendChild(li); });
+    if (empty) empty.style.display = vis.length ? 'none' : '';
+  }
+  document.querySelectorAll('[data-sort]').forEach(function (b) {
+    b.addEventListener('click', function () { state.sort = b.dataset.sort; mark('[data-sort]', 'data-sort', state.sort); apply(); });
+  });
+  document.querySelectorAll('[data-filter]').forEach(function (b) {
+    b.addEventListener('click', function () { state.filter = b.dataset.filter; mark('[data-filter]', 'data-filter', state.filter); apply(); });
+  });
+  document.querySelectorAll('#bm-dist [data-star]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var s = parseInt(b.dataset.star, 10);
+      state.star = (state.star === s) ? 0 : s;
+      document.querySelectorAll('#bm-dist [data-star]').forEach(function (x) {
+        x.classList.toggle('is-active', parseInt(x.dataset.star, 10) === state.star);
+      });
+      apply();
+    });
+  });
+  apply();
+})();
+</script>
 <?php panel_footer();
