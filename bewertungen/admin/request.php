@@ -180,16 +180,22 @@ function review_row(array $r, string $firstScraped = ''): string
     $author  = trim((string) ($r['author'] ?? '')) ?: 'Anonym';
     $initial = mb_strtoupper(mb_substr($author, 0, 1));
 
+    // Echtes Bewertungsdatum aus date_relative (z. B. "06/13/2018 10:13:27").
+    $raw = trim((string) ($r['date_relative'] ?? ''));
+    $ts  = $raw !== '' ? strtotime($raw) : false;
+    $dateLabel = $ts !== false ? date('d.m.Y', $ts) : $raw;
+
     $h  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '"'
         . ' data-rating="' . $rating . '"'
         . ' data-deleted="' . ((int) $r['is_deleted']) . '"'
         . ' data-new="' . ($isNew && !$r['is_deleted'] ? 1 : 0) . '"'
+        . ' data-ts="' . ($ts !== false ? $ts : 0) . '"'
         . ' data-seen="' . e((string) ($r['first_seen_at'] ?? '')) . '"'
         . ' data-id="' . (int) $r['id'] . '">';
     $h .= '<div class="rev__inner"><div class="rev__avatar">' . e($initial) . '</div><div class="rev__body">';
     $h .= '<div class="rev__head"><strong>' . e($author) . '</strong>';
     $h .= '<span class="rev__stars" title="' . $rating . ' von 5">' . e($stars) . '</span>';
-    if ($r['date_relative']) { $h .= '<span class="muted small">' . e($r['date_relative']) . '</span>'; }
+    if ($dateLabel !== '') { $h .= '<span class="muted small">' . e($dateLabel) . '</span>'; }
     if ($isNew && !$r['is_deleted']) { $h .= '<span class="badge st-scraped">neu</span>'; }
     if ($r['is_deleted']) { $h .= '<span class="badge st-reject">entfernt</span>'; }
     $h .= '</div>';
@@ -392,8 +398,10 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
       return true;
     });
     vis.sort(function (a, b) {
-      if (state.sort === 'best') return (b.dataset.rating - a.dataset.rating) || (b.dataset.id - a.dataset.id);
-      if (state.sort === 'schlecht') return (a.dataset.rating - b.dataset.rating) || (b.dataset.id - a.dataset.id);
+      if (state.sort === 'best') return (b.dataset.rating - a.dataset.rating) || (b.dataset.ts - a.dataset.ts);
+      if (state.sort === 'schlecht') return (a.dataset.rating - b.dataset.rating) || (b.dataset.ts - a.dataset.ts);
+      // Neueste: echtes Bewertungsdatum zuerst, dann Erfassung, dann id
+      if (a.dataset.ts !== b.dataset.ts) return b.dataset.ts - a.dataset.ts;
       if (a.dataset.seen !== b.dataset.seen) return a.dataset.seen < b.dataset.seen ? 1 : -1;
       return b.dataset.id - a.dataset.id;
     });
