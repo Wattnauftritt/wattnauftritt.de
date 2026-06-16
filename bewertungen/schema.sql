@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS bm_requests (
 -- Kundenlogins (vom Admin erzeugt) -----------------------------------------
 CREATE TABLE IF NOT EXISTS bm_customers (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  username      VARCHAR(80) NOT NULL,
+  username      VARCHAR(190) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   display_name  VARCHAR(160) NULL,
   email         VARCHAR(190) NULL,

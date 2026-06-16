@@ -96,18 +96,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash_set('error', 'Für diese Anfrage existiert bereits ein Kundenlogin.');
             redirect('request.php?id=' . $id);
         }
-        // Benutzernamen aus E-Mail-Lokalteil + Zufallssuffix bilden
-        $baseRaw = strtolower((string) strtok((string) $request['contact_email'], '@'));
-        $base = preg_replace('/[^a-z0-9]+/', '', $baseRaw) ?: 'kunde';
-        $username = $base;
-        for ($i = 0; $i < 6; $i++) {
-            $exists = db()->prepare('SELECT 1 FROM bm_customers WHERE username = ?');
-            $exists->execute([$username]);
-            if (!$exists->fetchColumn()) {
-                break;
-            }
-            $username = $base . random_int(100, 999);
+        // Benutzername = E-Mail-Adresse des Anfragenden.
+        $username = strtolower(trim((string) $request['contact_email']));
+
+        // Existiert bereits ein Konto mit dieser E-Mail? Dann verknüpfen statt neu anlegen.
+        $find = db()->prepare('SELECT id FROM bm_customers WHERE username = ?');
+        $find->execute([$username]);
+        $existingId = $find->fetchColumn();
+
+        if ($existingId) {
+            db()->prepare('UPDATE bm_requests SET customer_id = ? WHERE id = ?')->execute([(int) $existingId, $id]);
+            flash_set('ok', 'Bestehender Kundenzugang (' . $username . ') mit diesem Auftrag verknüpft. '
+                . 'Der Kunde sieht den Auftrag mit seinen vorhandenen Zugangsdaten.');
+            redirect('request.php?id=' . $id);
         }
+
         $password = bin2hex(random_bytes(5)); // 10 Zeichen
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
