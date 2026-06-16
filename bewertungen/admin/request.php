@@ -208,6 +208,59 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
 ?>
 <p><a class="btn-sm" href="<?= $isOrder ? 'auftraege.php' : 'index.php' ?>">← Zurück zur <?= $isOrder ? 'Auftragsliste' : 'Anfrageliste' ?></a></p>
 
+<div class="filterbar bm-maintabs" style="margin-bottom:1.2rem;">
+  <button type="button" data-maintab="bewertungen" class="is-active">★ Bewertungen</button>
+  <button type="button" data-maintab="verwaltung">Verwaltung &amp; Kunde</button>
+</div>
+
+<div class="tabpane" data-pane="bewertungen">
+<section class="box">
+  <h2>Bewertungen</h2>
+  <div class="stats" style="border-top:0;padding-top:0;">
+    <div class="stat"><span class="stat__num"><?= (int) $counts['total'] ?></span><span class="stat__lbl">gesamt</span></div>
+    <div class="stat"><span class="stat__num"><?= (int) $counts['aktiv'] ?></span><span class="stat__lbl">aktiv</span></div>
+    <div class="stat"><span class="stat__num del"><?= (int) $counts['geloescht'] ?></span><span class="stat__lbl">gelöscht (entfernt)</span></div>
+    <div class="stat"><span class="stat__num"><?= (int) $counts['neu'] ?></span><span class="stat__lbl">neu seit Start</span></div>
+  </div>
+
+  <?php if (!(int) $counts['total']): ?>
+    <p class="muted" style="margin-top:1rem;">Noch keine Bewertungen abgerufen. Wechsle zu „Verwaltung &amp; Kunde", um sie abzurufen.</p>
+  <?php else: ?>
+    <h3 class="sub">Verteilung (aktiv) – zum Filtern klicken</h3>
+    <div class="rating-dist" id="bm-dist">
+      <?php for ($s = 5; $s >= 1; $s--): $w = (int) round($dist[$s] / $distMax * 100); ?>
+        <button type="button" data-star="<?= $s ?>" title="Nur <?= $s ?>-Sterne-Bewertungen anzeigen">
+          <span class="rd-label"><?= $s ?> <b>★</b></span>
+          <span class="rd-track"><span class="rd-fill" style="width:<?= $w ?>%"></span></span>
+          <span class="rd-count"><?= (int) $dist[$s] ?></span>
+        </button>
+      <?php endfor; ?>
+    </div>
+
+    <div class="filterbar" style="margin-top:1.2rem;">
+      <span class="muted small" style="align-self:center;margin-right:.3rem;">Sortieren:</span>
+      <button type="button" data-sort="neu" class="is-active">Neueste</button>
+      <button type="button" data-sort="best">Beste</button>
+      <button type="button" data-sort="schlecht">Schlechteste</button>
+    </div>
+    <div class="filterbar">
+      <span class="muted small" style="align-self:center;margin-right:.3rem;">Filter:</span>
+      <button type="button" data-filter="alle" class="is-active">Alle</button>
+      <button type="button" data-filter="aktiv">Aktiv</button>
+      <button type="button" data-filter="neu">Neu</button>
+      <button type="button" data-filter="geloescht">Gelöscht</button>
+    </div>
+
+    <ul class="revlist" id="bm-revlist" style="margin-top:1rem;">
+      <?php foreach ($reviews as $r) { echo review_row($r, $firstScraped); } ?>
+    </ul>
+    <p class="muted" id="bm-empty" style="margin-top:1rem;display:none;">Keine Bewertungen für diese Auswahl.</p>
+  <?php endif; ?>
+</section>
+</div>
+
+<div class="tabpane" data-pane="verwaltung" hidden>
+
 <div class="grid2">
   <section class="box">
     <h2>Objekt</h2>
@@ -331,50 +384,7 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
     </form>
   <?php endif; ?>
 </section>
-
-<section class="box">
-  <h2>Bewertungen</h2>
-  <div class="stats" style="border-top:0;padding-top:0;">
-    <div class="stat"><span class="stat__num"><?= (int) $counts['total'] ?></span><span class="stat__lbl">gesamt</span></div>
-    <div class="stat"><span class="stat__num"><?= (int) $counts['aktiv'] ?></span><span class="stat__lbl">aktiv</span></div>
-    <div class="stat"><span class="stat__num del"><?= (int) $counts['geloescht'] ?></span><span class="stat__lbl">gelöscht (entfernt)</span></div>
-    <div class="stat"><span class="stat__num"><?= (int) $counts['neu'] ?></span><span class="stat__lbl">neu seit Start</span></div>
-  </div>
-
-  <?php if (!(int) $counts['total']): ?>
-    <p class="muted" style="margin-top:1rem;">Noch keine Bewertungen abgerufen.</p>
-  <?php else: ?>
-    <h3 class="sub">Verteilung (aktiv) – zum Filtern klicken</h3>
-    <div class="rating-dist" id="bm-dist">
-      <?php for ($s = 5; $s >= 1; $s--): $w = (int) round($dist[$s] / $distMax * 100); ?>
-        <button type="button" data-star="<?= $s ?>" title="Nur <?= $s ?>-Sterne-Bewertungen anzeigen">
-          <span class="rd-label"><?= $s ?> <b>★</b></span>
-          <span class="rd-track"><span class="rd-fill" style="width:<?= $w ?>%"></span></span>
-          <span class="rd-count"><?= (int) $dist[$s] ?></span>
-        </button>
-      <?php endfor; ?>
-    </div>
-
-    <div class="filterbar" style="margin-top:1.2rem;">
-      <span class="muted small" style="align-self:center;margin-right:.3rem;">Sortieren:</span>
-      <button type="button" data-sort="neu" class="is-active">Neueste</button>
-      <button type="button" data-sort="best">Beste</button>
-      <button type="button" data-sort="schlecht">Schlechteste</button>
-    </div>
-    <div class="filterbar">
-      <span class="muted small" style="align-self:center;margin-right:.3rem;">Filter:</span>
-      <button type="button" data-filter="alle" class="is-active">Alle</button>
-      <button type="button" data-filter="aktiv">Aktiv</button>
-      <button type="button" data-filter="neu">Neu</button>
-      <button type="button" data-filter="geloescht">Gelöscht</button>
-    </div>
-
-    <ul class="revlist" id="bm-revlist" style="margin-top:1rem;">
-      <?php foreach ($reviews as $r) { echo review_row($r, $firstScraped); } ?>
-    </ul>
-    <p class="muted" id="bm-empty" style="margin-top:1rem;display:none;">Keine Bewertungen für diese Auswahl.</p>
-  <?php endif; ?>
-</section>
+</div>
 
 <script>
 (function () {
@@ -426,6 +436,20 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
     });
   });
   apply();
+})();
+
+// Haupt-Tabs: Bewertungen / Verwaltung
+(function () {
+  var tabs = document.querySelectorAll('.bm-maintabs [data-maintab]');
+  var panes = document.querySelectorAll('.tabpane[data-pane]');
+  if (!tabs.length) return;
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      var target = t.dataset.maintab;
+      tabs.forEach(function (x) { x.classList.toggle('is-active', x === t); });
+      panes.forEach(function (p) { p.hidden = (p.dataset.pane !== target); });
+    });
+  });
 })();
 </script>
 <?php panel_footer();
