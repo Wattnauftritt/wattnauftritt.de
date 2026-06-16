@@ -30,8 +30,9 @@ ALTER TABLE bm_reviews
   ADD COLUMN external_id VARCHAR(190) NULL AFTER fingerprint,
   ADD KEY idx_external (external_id);
 
--- 3) Kundenlogins: Passwort-Reset
+-- 3) Kundenlogins: Passwort-Reset + Benutzername = E-Mail (laengeres Feld)
 ALTER TABLE bm_customers
+  MODIFY username VARCHAR(190) NOT NULL,
   ADD COLUMN reset_token   CHAR(64) NULL AFTER is_active,
   ADD COLUMN reset_expires DATETIME NULL AFTER reset_token,
   ADD KEY idx_reset (reset_token);
