@@ -17,16 +17,28 @@ $requests = $rs->fetchAll();
 
 function c_review_row(array $r): string
 {
-    $stars = $r['rating'] !== null ? str_repeat('★', (int) $r['rating']) . str_repeat('☆', max(0, 5 - (int) $r['rating'])) : '';
-    $html  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '">';
-    $html .= '<div class="rev__head"><strong>' . e($r['author'] ?: 'Anonym') . '</strong>';
-    $html .= '<span class="rev__stars">' . e($stars) . '</span>';
-    if ($r['date_relative']) { $html .= '<span class="muted small">' . e($r['date_relative']) . '</span>'; }
-    if ($r['is_deleted']) { $html .= '<span class="badge st-reject">entfernt</span>'; }
-    $html .= '</div>';
-    if ($r['text']) { $html .= '<p class="rev__text">' . nl2br(e($r['text'])) . '</p>'; }
-    $html .= '</li>';
-    return $html;
+    $rating  = $r['rating'] !== null ? (int) $r['rating'] : 0;
+    $stars   = $rating ? str_repeat('★', $rating) . str_repeat('☆', max(0, 5 - $rating)) : '';
+    $author  = trim((string) ($r['author'] ?? '')) ?: 'Anonym';
+    $initial = mb_strtoupper(mb_substr($author, 0, 1));
+    $raw     = trim((string) ($r['date_relative'] ?? ''));
+    $ts      = $raw !== '' ? strtotime($raw) : false;
+    $dateLbl = $ts !== false ? date('d.m.Y', $ts) : $raw;
+
+    $h  = '<li class="rev' . ($r['is_deleted'] ? ' rev--del' : '') . '"'
+        . ' data-deleted="' . ((int) $r['is_deleted']) . '"'
+        . ' data-rating="' . $rating . '"'
+        . ' data-ts="' . ($ts !== false ? $ts : 0) . '"'
+        . ' data-id="' . (int) $r['id'] . '">';
+    $h .= '<div class="rev__inner"><div class="rev__avatar">' . e($initial) . '</div><div class="rev__body">';
+    $h .= '<div class="rev__head"><strong>' . e($author) . '</strong>';
+    $h .= '<span class="rev__stars" title="' . $rating . ' von 5">' . e($stars) . '</span>';
+    if ($dateLbl !== '') { $h .= '<span class="muted small">' . e($dateLbl) . '</span>'; }
+    if ($r['is_deleted']) { $h .= '<span class="badge st-reject">entfernt</span>'; }
+    $h .= '</div>';
+    if ($r['text']) { $h .= '<p class="rev__text">' . nl2br(e($r['text'])) . '</p>'; }
+    $h .= '</div></div></li>';
+    return $h;
 }
 
 panel_header('Mein Auftrag', 'kunde');
@@ -44,10 +56,10 @@ foreach ($requests as $req) {
     $vs = db()->prepare('SELECT * FROM bm_reviews WHERE request_id = ? ORDER BY id DESC');
     $vs->execute([(int) $req['id']]);
     $reviews = $vs->fetchAll();
-    $active  = array_values(array_filter($reviews, fn($r) => !$r['is_deleted']));
-    $deleted = array_values(array_filter($reviews, fn($r) => $r['is_deleted']));
+    $activeN  = count(array_filter($reviews, fn($r) => !$r['is_deleted']));
+    $deletedN = count(array_filter($reviews, fn($r) => $r['is_deleted']));
     ?>
-    <section class="box">
+    <section class="box bm-order" data-order="<?= (int) $req['id'] ?>">
       <div class="order-head">
         <div>
           <h2 style="margin:0;"><?= e($req['property_name']) ?></h2>
@@ -57,24 +69,74 @@ foreach ($requests as $req) {
       </div>
 
       <div class="stats">
-        <div class="stat"><span class="stat__num"><?= count($active) ?></span><span class="stat__lbl">aktive Bewertungen</span></div>
-        <div class="stat"><span class="stat__num del"><?= count($deleted) ?></span><span class="stat__lbl">entfernte Bewertungen</span></div>
+        <div class="stat"><span class="stat__num"><?= $activeN ?></span><span class="stat__lbl">aktuelle Bewertungen</span></div>
+        <div class="stat"><span class="stat__num del"><?= $deletedN ?></span><span class="stat__lbl">entfernte Bewertungen</span></div>
         <div class="stat"><span class="stat__num"><?= count($reviews) ?></span><span class="stat__lbl">gesichert insgesamt</span></div>
       </div>
 
       <?php if (!$reviews): ?>
-        <p class="muted">Ihre Bewertungen werden gerade gesichert. Sobald das abgeschlossen ist, erscheinen sie hier.</p>
+        <p class="muted" style="margin-top:1rem;">Ihre Bewertungen werden gerade gesichert. Sobald das abgeschlossen ist, erscheinen sie hier.</p>
       <?php else: ?>
-        <?php if ($deleted): ?>
-          <h3 class="sub">Bereits entfernte Bewertungen</h3>
-          <ul class="revlist"><?php foreach ($deleted as $r) { echo c_review_row($r); } ?></ul>
-        <?php endif; ?>
-        <?php if ($active): ?>
-          <h3 class="sub">Aktuelle Bewertungen</h3>
-          <ul class="revlist"><?php foreach ($active as $r) { echo c_review_row($r); } ?></ul>
-        <?php endif; ?>
+        <div class="filterbar bm-tabs" style="margin-top:1.2rem;">
+          <button type="button" data-tab="aktuell" class="is-active">Aktuelle (<?= $activeN ?>)</button>
+          <button type="button" data-tab="entfernt">Entfernte (<?= $deletedN ?>)</button>
+          <button type="button" data-tab="alle">Alle (<?= count($reviews) ?>)</button>
+        </div>
+        <div class="filterbar">
+          <span class="muted small" style="align-self:center;margin-right:.3rem;">Sortieren:</span>
+          <button type="button" data-sort="neu" class="is-active">Neueste</button>
+          <button type="button" data-sort="best">Beste</button>
+          <button type="button" data-sort="schlecht">Schlechteste</button>
+        </div>
+
+        <ul class="revlist" data-list style="margin-top:1rem;">
+          <?php foreach ($reviews as $r) { echo c_review_row($r); } ?>
+        </ul>
+        <p class="muted" data-empty style="margin-top:1rem;display:none;">In dieser Ansicht sind keine Bewertungen.</p>
       <?php endif; ?>
     </section>
     <?php
 }
+?>
+<script>
+(function () {
+  document.querySelectorAll('.bm-order').forEach(function (block) {
+    var list = block.querySelector('[data-list]');
+    if (!list) return;
+    var items = [].slice.call(list.children);
+    var empty = block.querySelector('[data-empty]');
+    var state = { tab: 'aktuell', sort: 'neu' };
+
+    function mark(sel, attr, val) {
+      block.querySelectorAll(sel).forEach(function (b) {
+        b.classList.toggle('is-active', b.getAttribute(attr) === String(val));
+      });
+    }
+    function apply() {
+      var vis = items.filter(function (li) {
+        if (state.tab === 'aktuell') return li.dataset.deleted !== '1';
+        if (state.tab === 'entfernt') return li.dataset.deleted === '1';
+        return true;
+      });
+      vis.sort(function (a, b) {
+        if (state.sort === 'best') return (b.dataset.rating - a.dataset.rating) || (b.dataset.ts - a.dataset.ts);
+        if (state.sort === 'schlecht') return (a.dataset.rating - b.dataset.rating) || (b.dataset.ts - a.dataset.ts);
+        if (a.dataset.ts !== b.dataset.ts) return b.dataset.ts - a.dataset.ts;
+        return b.dataset.id - a.dataset.id;
+      });
+      items.forEach(function (li) { li.style.display = 'none'; });
+      vis.forEach(function (li) { li.style.display = ''; list.appendChild(li); });
+      if (empty) empty.style.display = vis.length ? 'none' : '';
+    }
+    block.querySelectorAll('[data-tab]').forEach(function (b) {
+      b.addEventListener('click', function () { state.tab = b.dataset.tab; mark('[data-tab]', 'data-tab', state.tab); apply(); });
+    });
+    block.querySelectorAll('[data-sort]').forEach(function (b) {
+      b.addEventListener('click', function () { state.sort = b.dataset.sort; mark('[data-sort]', 'data-sort', state.sort); apply(); });
+    });
+    apply();
+  });
+})();
+</script>
+<?php
 panel_footer();
