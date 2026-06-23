@@ -218,8 +218,32 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
 
 <div class="tabpane" data-pane="bewertungen">
 <section class="box">
-  <h2>Bewertungen</h2>
-  <div class="stats" style="border-top:0;padding-top:0;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <h2 style="margin:0;">Bewertungen</h2>
+    <form method="post" style="display:flex;gap:.5rem;flex-wrap:wrap;margin:0;">
+      <?= csrf_field() ?>
+      <?php if (($request['scrape_job_status'] ?? 'none') === 'pending'): ?>
+        <button class="btn-sm" name="action" value="resume">Ergebnis abrufen</button>
+      <?php else: ?>
+        <button class="btn-sm" name="action" value="scrape"
+          onclick="return confirm('Jetzt Bewertungen für diesen Kunden abrufen? Das verbraucht API-Credits.');">
+          ↻ Jetzt aktualisieren
+        </button>
+        <?php if ($request['scraped_at']): ?>
+        <button class="btn-sm" name="action" value="reconcile" style="background:var(--brand-deep);"
+          onclick="return confirm('Abgleich starten und entfernte Bewertungen erkennen?');">
+          Abgleichen
+        </button>
+        <?php endif; ?>
+      <?php endif; ?>
+    </form>
+  </div>
+  <p class="muted small" style="margin:.4rem 0 0;">
+    <?= $request['scraped_at'] ? 'Zuletzt abgerufen: ' . e(date('d.m.Y H:i', strtotime($request['scraped_at']))) : 'Noch nicht abgerufen.' ?>
+    <?= $request['reconciled_at'] ? ' · Letzter Abgleich: ' . e(date('d.m.Y H:i', strtotime($request['reconciled_at']))) : '' ?>
+    · Anbieter: <?= e(reviews_provider()) ?>
+  </p>
+  <div class="stats" style="border-top:1px solid var(--line);margin-top:1rem;padding-top:1rem;">
     <div class="stat"><span class="stat__num"><?= (int) $counts['total'] ?></span><span class="stat__lbl">gesamt</span></div>
     <div class="stat"><span class="stat__num"><?= (int) $counts['aktiv'] ?></span><span class="stat__lbl">aktiv</span></div>
     <div class="stat"><span class="stat__num del"><?= (int) $counts['geloescht'] ?></span><span class="stat__lbl">gelöscht (entfernt)</span></div>
