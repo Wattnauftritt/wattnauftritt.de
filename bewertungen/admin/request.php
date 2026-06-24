@@ -35,11 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $action = $_POST['action'] ?? '';
 
-    if ($action === 'scrape' || $action === 'reconcile' || $action === 'resume') {
+    if (in_array($action, ['scrape', 'quick', 'reconcile', 'resume'], true)) {
         if ($action === 'resume') {
             $res = resume_request_job($id);
         } else {
-            $res = scrape_request($id, $action === 'reconcile' ? 'reconcile' : 'full');
+            $mode = $action === 'reconcile' ? 'reconcile' : ($action === 'quick' ? 'quick' : 'full');
+            $res = scrape_request($id, $mode);
         }
         if ($res['err']) {
             flash_set('error', 'Abruf abgebrochen: ' . $res['err']);
@@ -224,17 +225,24 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
       <?= csrf_field() ?>
       <?php if (($request['scrape_job_status'] ?? 'none') === 'pending'): ?>
         <button class="btn-sm" name="action" value="resume">Ergebnis abrufen</button>
-      <?php else: ?>
-        <button class="btn-sm" name="action" value="scrape"
-          onclick="return confirm('Jetzt Bewertungen für diesen Kunden abrufen? Das verbraucht API-Credits.');">
-          ↻ Jetzt aktualisieren
+      <?php elseif ($request['scraped_at']): ?>
+        <button class="btn-sm" name="action" value="quick"
+          onclick="return confirm('Nur neue Bewertungen abrufen (inkrementell, günstig)?');">
+          ↻ Nur neue (günstig)
         </button>
-        <?php if ($request['scraped_at']): ?>
         <button class="btn-sm" name="action" value="reconcile" style="background:var(--brand-deep);"
           onclick="return confirm('Abgleich starten und entfernte Bewertungen erkennen?');">
           Abgleichen
         </button>
-        <?php endif; ?>
+        <button class="btn-sm" name="action" value="scrape" style="background:transparent;color:var(--ink);border:1px solid var(--line);"
+          onclick="return confirm('Alle Bewertungen komplett neu abrufen? Verbraucht mehr Credits.');">
+          Alle neu abrufen
+        </button>
+      <?php else: ?>
+        <button class="btn-sm" name="action" value="scrape"
+          onclick="return confirm('Bewertungen erstmalig abrufen? Das verbraucht API-Credits.');">
+          Freigeben &amp; abrufen
+        </button>
       <?php endif; ?>
     </form>
   </div>
@@ -365,7 +373,7 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
 
   <section class="box">
     <h2>Bewertungen abrufen</h2>
-    <p class="muted small">Verbraucht API-Credits (<?= e(reviews_provider()) ?>). „Abgleichen" erkennt zusätzlich gelöschte Bewertungen.</p>
+    <p class="muted small">Verbraucht API-Credits (<?= e(reviews_provider()) ?>). <strong>Nur neue</strong> = günstiger inkrementeller Abruf (nur die neuesten). <strong>Abgleichen</strong> = Vollabgleich inkl. Löscherkennung. <strong>Alle neu</strong> = kompletter Voll-Scrape.</p>
 
     <?php if (($request['scrape_job_status'] ?? 'none') === 'pending'): ?>
       <div class="flash flash--ok">Ein Abruf läuft im Hintergrund (Async). Klicke „Ergebnis abrufen", sobald er fertig ist.</div>
@@ -373,19 +381,29 @@ panel_header(($isOrder ? 'Auftrag' : 'Anfrage') . ' #' . $id, 'admin');
         <?= csrf_field() ?>
         <button class="btn btn--primary" name="action" value="resume">Ergebnis abrufen</button>
       </form>
-    <?php else: ?>
+    <?php elseif ($request['scraped_at']): ?>
       <form method="post" class="actions-col">
         <?= csrf_field() ?>
-        <button class="btn btn--primary" name="action" value="scrape"
-          onclick="return confirm('Jetzt alle Bewertungen abrufen? Das verbraucht API-Credits.');">
-          <?= $request['scraped_at'] ? 'Erneut vollständig abrufen' : 'Freigeben &amp; Bewertungen abrufen' ?>
+        <button class="btn btn--primary" name="action" value="quick"
+          onclick="return confirm('Nur neue Bewertungen abrufen (inkrementell, günstig)?');">
+          Nur neue abrufen (günstig)
         </button>
-        <?php if ($request['scraped_at']): ?>
         <button class="btn btn--ghost" name="action" value="reconcile" style="color:var(--ink);border-color:var(--line);"
           onclick="return confirm('Abgleich starten und Löschungen markieren?');">
           Abgleichen (Löschungen erkennen)
         </button>
-        <?php endif; ?>
+        <button class="btn btn--ghost" name="action" value="scrape" style="color:var(--ink);border-color:var(--line);"
+          onclick="return confirm('Alle Bewertungen komplett neu abrufen? Verbraucht mehr Credits.');">
+          Alle neu abrufen
+        </button>
+      </form>
+    <?php else: ?>
+      <form method="post" class="actions-col">
+        <?= csrf_field() ?>
+        <button class="btn btn--primary" name="action" value="scrape"
+          onclick="return confirm('Bewertungen erstmalig abrufen? Das verbraucht API-Credits.');">
+          Freigeben &amp; Bewertungen abrufen
+        </button>
       </form>
     <?php endif; ?>
 
